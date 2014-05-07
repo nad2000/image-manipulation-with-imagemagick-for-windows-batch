@@ -9,6 +9,7 @@ Created on Mon May  5 18:13:46 2014
 from docopt import docopt
 import subprocess
 import tempfile
+import os
 
 USAGE = """
 USAGE:
@@ -26,9 +27,15 @@ OPTIONS:
 
 PASSWORD = "p4s5w0rd"
 
+if os.name == 'nt':
+    IM_CMD = r'C:\Program Files (x86)\ImageMagick-6.8.9-Q16\convert.exe'
+else:
+    IM_CMD = 'convert'
+
 #%%
+
 def get_im_version():
-    version = subprocess.check_output(['convert', '-list', 'configure'])
+    version = subprocess.check_output([IM_CMD, '-list', 'configure'])
     version = version[version.find('LIB_VERSION_NUMBER'):]
     version = version[:version.find('\n')]
     version = version.split()[1]
@@ -40,7 +47,7 @@ def get_im_version():
 # docopt(USAGE, ['-b', '123', '-P', 'p4sw0rd', 'IF', 'OF' ])
 
 def run_im(opt):
-    cmd = ['convert']
+    cmd = [IM_CMD]
     cmd += opt
     print ' '.join(cmd)
     subprocess.call(cmd)
