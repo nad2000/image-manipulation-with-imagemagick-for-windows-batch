@@ -15,7 +15,7 @@ import utl
 
 USAGE = """
 USAGE:
- cartoon [-p PATTERN] [-n NUMLEVELS] [-e EDGEAMOUNT] [-b BRIGHTNESS] [-s SATURATION] -P PASSWORD INFILE OUTFILE
+ cartoon -P PASSWORD [-p PATTERN] [-n NUMLEVELS] [-e EDGEAMOUNT] [-b BRIGHTNESS] [-s SATURATION] INFILE OUTFILE
  cartoon -h,--help
 
 OPTIONS:
@@ -25,7 +25,7 @@ OPTIONS:
  -b BRIGHTNESS  brightness of cartoon; integer>=0; [default: 100]
  -s SATURATION  saturation of cartoon; integer>=0; [default: 100]
  -P PASSWORD    password for accessing the application
- """
+"""
 
 PASSWORD = "p4s5w0rd"
 
