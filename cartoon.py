@@ -80,6 +80,8 @@ def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
 
     utl.run_im(opt)
 
+    utl.delete_tmp_files(tmpA1, tmpA2, tmpB1, tmpB2)
+
 
 if __name__ == "__main__":
 

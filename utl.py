@@ -3,12 +3,17 @@
 
 import subprocess
 import os
+from cStringIO import StringIO
+from math import sqrt
+
 
 if os.name == 'nt':
     import distutils.spawn
     IM_CMD = distutils.spawn.find_executable("convert")
 else:
     IM_CMD = 'convert'
+
+verbose = False
 
 #%%
 im_version = None
@@ -24,12 +29,66 @@ def get_im_version():
         im_version = version
     return im_version
 
+
+def get_colors(file_name):
+
+    lines = subprocess.check_output([
+        IM_CMD, file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
+        '-define','histogram:unique-colors=true','histogram:info:-'])
+
+    return [map(
+        int,
+        l[l.find('(')+1:l.find(')')].replace(' ', '').split(',')) for l in StringIO(lines) if '(' in l]
+
 #%%
 
-# docopt(USAGE, ['-b', '123', '-P', 'p4sw0rd', 'IF', 'OF' ])
+
+def color_num(file_name):
+
+    return int(subprocess.check_output([IM_CMD, file_name, '-format', '"%k"', 'info:']).strip('"\' \t\n\r'))
+
+def get_dim(file_name):
+
+    return tuple(
+        map(int,subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
+
+#%%
 
 def run_im(opt):
+
+    global verbose
+
     cmd = [IM_CMD]
     cmd += opt
-    print ' '.join(cmd)
+    if verbose:
+        print ' '.join(cmd)
+
     subprocess.call(cmd)
+
+
+def delete_tmp_files(*files):
+
+    for f in files:
+        try:
+            os.remove(f)
+        except:
+            pass
+
+
+def rgb_dist(c, m):
+    return sqrt(sum((_[0]-_[1])**2 for _ in zip(c,m)))
+
+
+def lum(color):
+    R, G, B = color
+    return 0.299 * R + 0.587 * G + 0.114 * B
+
+
+def rgbl_dist(c, m):
+    c_R, c_G, c_B = c
+    m_R, m_G, m_B = m
+    return sqrt(
+        (0.299 * ((c_R - m_R) ** 2)
+        + 0.587 * ((c_G - m_G) ** 2)
+        + 0.114 * ((c_B - m_B) ** 2)) * 0.75
+        + (lum(c) - lum(m)) ** 2)
