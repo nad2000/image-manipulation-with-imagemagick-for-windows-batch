@@ -7,11 +7,11 @@ Created on Mon May  5 18:13:46 2014
 """
 
 from docopt import docopt
-import subprocess
 import tempfile
-import os
+import sys
 
 import utl
+import conf
 
 USAGE = """
 USAGE:
@@ -27,9 +27,6 @@ OPTIONS:
  -P PASSWORD    password for accessing the application
 """
 
-PASSWORD = "p4s5w0rd"
-
-
 def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outfile):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
@@ -39,7 +36,7 @@ def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
 
     version  = utl.get_im_version()
 
-    edgewidth = 2			# edge width; integer>=0
+    edgewidth = 2		# edge width; integer>=0
     edgethresh = 90		# edge threshold; 0<=integer<=100
 
     if (version < "06070607" or version > "06070707") and version <= "06080504":
@@ -85,9 +82,13 @@ def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
 
 if __name__ == "__main__":
 
+    if "--verbose" in sys.argv:
+        utl.verbose = True
+        sys.argv.pop(sys.argv.index("--verbose"))
+
     o = docopt(USAGE)
-    #if o['-P'] != PASSWORD:
-    #    raise Exception("Wrong password! Access denied!")
+    if o['-P'] != conf.PASSWORD:
+        raise Exception("Wrong password! Access denied!")
 
     cartoon(
         pattern=o['-p'], numlevels=o['-n'], edgeamount=o['-e'],
