@@ -16,7 +16,7 @@ import conf
 USAGE = """
 USAGE:
  cartoon -P PASSWORD [-p PATTERN] [-n NUMLEVELS] [-e EDGEAMOUNT] [-b BRIGHTNESS] [-s SATURATION] INFILE OUTFILE
- cartoon -h,--help
+ cartoon -h|--help
 
 OPTIONS:
  -p PATTERN     segmentation pattern (shape); 0<=integer<=100; [default: 70]
@@ -82,13 +82,7 @@ def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
 
 if __name__ == "__main__":
 
-    if "--verbose" in sys.argv:
-        utl.verbose = True
-        sys.argv.pop(sys.argv.index("--verbose"))
-
-    o = docopt(USAGE)
-    if o['-P'] != conf.PASSWORD:
-        raise Exception("Wrong password! Access denied!")
+    o = utl.get_args(USAGE)
 
     cartoon(
         pattern=o['-p'], numlevels=o['-n'], edgeamount=o['-e'],

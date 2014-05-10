@@ -2,9 +2,12 @@
 
 import subprocess
 import os
+import sys
+from docopt import docopt
 from cStringIO import StringIO
 from math import sqrt
 
+import conf
 
 if os.name == 'nt':
     import distutils.spawn
@@ -13,6 +16,25 @@ else:
     IM_CMD = 'convert'
 
 verbose = False
+
+
+def get_args(usage):
+
+    global verbose
+
+    if "--verbose" in sys.argv:
+        verbose = True
+        sys.argv.pop(sys.argv.index("--verbose"))
+
+    o = docopt(usage)
+    print o
+
+    if o['-P'] != conf.PASSWORD:
+        #raise Exception("Wrong password! Access denied!")
+        print "Wrong password! Access denied!"
+        exit(-1)
+
+    return o
 
 #%%
 im_version = None
@@ -50,6 +72,27 @@ def get_dim(file_name):
 
     return tuple(
         map(int,subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
+
+def get_cspace_option():
+    """
+    colorspace RGB and sRGB swapped between 6.7.5.5 and 6.7.6.7
+    though probably not resolved until the latter
+    then -colorspace gray changed to linear between 6.7.6.7 and 6.7.8.2
+    then -separate converted to linear gray channels between 6.7.6.7 and 6.7.8.2,
+    though probably not resolved until the latter
+    so -colorspace HSL/HSB -separate and -colorspace gray became linear
+    but we need to use -set colorspace RGB before using them at appropriate times
+    so that results stay as in original script
+    The following was determined from various version tests using nightvision.
+    with IM 6.7.4.10, 6.7.6.10, 6.8.3.2
+    """
+    version  = get_im_version()
+
+    if (version < "06070607" or version > "06070707") and version <= "06080504":
+        return ['-set', 'colorspace', 'RGB']
+    else:
+        return []
+
 
 #%%
 

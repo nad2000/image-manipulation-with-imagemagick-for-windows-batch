@@ -33,13 +33,6 @@ def vignette(infile, outfile, inner=0, outer=150, feather=0, color='black', amou
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
-    version  = utl.get_im_version()
-
-    if (version < "06070607" or version > "06070707") and version <= "06080504":
-        setcspace = ['-set', 'colorspace', 'RGB']
-    else:
-        setcspace = []
-
     # test input image
     utl.run_im([
         '-quiet', '-regard-warnings', infile, '+repage', tmpA1])
@@ -71,7 +64,7 @@ def vignette(infile, outfile, inner=0, outer=150, feather=0, color='black', amou
         '(', '-size', "{}x{}".format(mwh, mwh), 'radial-gradient:',
         '-resize',  "{:.0f}x{:.0f}!".format(wwo, hho), '-gravity', 'center',
         '-crop', "{}x{}+0+0".format(ww, hh), '+repage',] + mlevel + plevel + feathering
-        + [')'] + setcspace + ['-alpha', 'off', '-compose', 'copy_opacity', '-composite',
+        + [')'] + utl.get_cspace_option() + ['-alpha', 'off', '-compose', 'copy_opacity', '-composite',
          '-compose', 'over', '-flatten', outfile])
 
     utl.delete_tmp_files(tmpA1, tmpB1)
