@@ -6,12 +6,8 @@ Created on Mon May  5 18:13:46 2014
 @author: rad.cirskis
 """
 
-from docopt import docopt
 import tempfile
-import sys
-
 import utl
-import conf
 
 USAGE = """
 USAGE:

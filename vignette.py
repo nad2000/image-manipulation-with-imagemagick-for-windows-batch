@@ -6,12 +6,8 @@ Created on Mon May  5 18:13:46 2014
 @author: rad.cirskis
 """
 
-from docopt import docopt
 import tempfile
-import sys
-
 import utl
-import conf
 
 USAGE = """
 USAGE:
@@ -71,13 +67,7 @@ def vignette(infile, outfile, inner=0, outer=150, feather=0, color='black', amou
 
 if __name__ == "__main__":
 
-    if "--verbose" in sys.argv:
-        utl.verbose = True
-        sys.argv.pop(sys.argv.index("--verbose"))
-
-    o = docopt(USAGE)
-    if o['-P'] != conf.PASSWORD:
-        raise Exception("Wrong password! Access denied!")
+    o = utl.get_args(USAGE)
 
     vignette(
         inner=o['-i'], outer=o['-o'], feather=o['-f'], color=o['-c'], amount=o['-a'],
