@@ -24,7 +24,7 @@ OPTIONS:
  -P PASSWORD   password for accessing the application
 """
 
-def remap(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
+def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
 
     tmpA = tempfile.mktemp(suffix='.mpc')
     tmpM = tempfile.mktemp(suffix='.mpc')
@@ -104,6 +104,6 @@ if __name__ == "__main__":
 
     o = utl.get_args(USAGE)
 
-    remap(
+    process(
         metric=o['-m'], ncolors=o['-n'], show=o['-s'],
         infile=o.get('INFILE'), mapfile=o.get('MAPFILE'), outfile=o.get('OUTFILE'),)

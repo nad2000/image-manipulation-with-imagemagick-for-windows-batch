@@ -29,7 +29,7 @@ OPTIONS:
  -P PASSWORD    password for accessing the application
  """
 
-def nightvision(infile, outfile, brightness='100', diameter='60', rolloff='0',
+def process(infile, outfile, brightness='100', diameter='60', rolloff='0',
              noise='2', seed='100', blooming='no', threshold='5'):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
@@ -65,13 +65,13 @@ def nightvision(infile, outfile, brightness='100', diameter='60', rolloff='0',
     else:
         lighten = []
 
-    utl.run_im(['(', tmpA1,] + lighten + ['-attenuate', noise, '-seed', seed, '+noise', 'gaussian',]
+    utl.run_im(['(', tmpA1, lighten, '-attenuate', noise, '-seed', seed, '+noise', 'gaussian',]
         + setcspace + ['-colorspace', 'gray', ')',
         '(', '-clone', '0', '-fill', 'green1', '-colorize', str(brightness) + '%', ')',
         '-compose', 'multiply', '-composite',
         '(', '-clone', '0', '-fill', 'white', '-colorize', '100%', '-fill', 'black',
         '-draw', "translate {},{} ellipse ".format(xc, yc) + args, '-alpha', 'off', '-morphology',
-        'Distance', 'Euclidean:4', '-auto-level',] + leveling + [')',
+        'Distance', 'Euclidean:4', '-auto-level', leveling, ')',
         '(', '-clone','0', '-fill', 'black', '-colorize', '100%', ')',
         '+swap', '-compose', 'over', '-composite', tmpA2])
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     o = utl.get_args(USAGE)
 
-    nightvision(
+    process(
         brightness=o.get('-b'), diameter=o.get('-d'), rolloff=o.get('-r'), noise=o.get('-n'),
         seed=o.get('-s'), blooming=o.get('-B'), threshold=o.get('-T'),
         infile=o.get('INFILE'), outfile=o.get('OUTFILE'))

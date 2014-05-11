@@ -24,7 +24,7 @@ OPTIONS:
  -P PASSWORD   password for accessing the application
 """
 
-def vignette(infile, outfile, inner=0, outer=150, feather=0, color='black', amount=100, show=False):
+def process(infile, outfile, inner=0, outer=150, feather=0, color='black', amount=100, show=False):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
@@ -69,6 +69,6 @@ if __name__ == "__main__":
 
     o = utl.get_args(USAGE)
 
-    vignette(
+    process(
         inner=o['-i'], outer=o['-o'], feather=o['-f'], color=o['-c'], amount=o['-a'],
         show=o.get('-s'), infile=o.get('INFILE'), outfile=o.get('OUTFILE'),)

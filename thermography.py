@@ -20,15 +20,15 @@ OPTIONS:
  -P PASSWORD  password for accessing the application
 """
 
-def thermography(infile, outfile, lowpt='0', highpt='100'):
+def process(infile, outfile, lowpt='0', highpt='100'):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
     # test input image
     utl.run_im([
-        '-quiet', '-regard-warnings', infile,] + utl.get_cspace_option()
-        + ['-colorspace', 'gray', '+repage', tmpA1])
+        '-quiet', '-regard-warnings', infile, utl.get_cspace_option(),
+        '-colorspace', 'gray', '+repage', tmpA1])
 
     #convert lowpt and highpt to range and offset
     range_ = int(round(1000 * (int(highpt) - int(lowpt)) / 100., 0))
@@ -38,8 +38,8 @@ def thermography(infile, outfile, lowpt='0', highpt='100'):
     utl.run_im([
         tmpA1, '(', '-size','1x1', 'xc:blueviolet', 'xc:blue', 'xc:cyan', 'xc:green1', 'xc:yellow', 'xc:orange', 'xc:red',
         '+append', '-filter', 'Cubic', '-resize', '1000x1!', '-crop',
-        "{}x{}+{}+0".format(range_, range_, offset), '+repage', '-resize', '1000x1!', ')',]
-        + utl.get_cspace_option() + ['-clut', outfile])
+        "{}x{}+{}+0".format(range_, range_, offset), '+repage', '-resize', '1000x1!', ')',
+        utl.get_cspace_option(), '-clut', outfile])
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 
@@ -47,6 +47,6 @@ if __name__ == "__main__":
 
     o = utl.get_args(USAGE)
 
-    thermography(
+    process(
         lowpt=o.get('-l'), highpt=o.get('-H'),
         infile=o.get('INFILE'), outfile=o.get('OUTFILE'))

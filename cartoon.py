@@ -23,7 +23,7 @@ OPTIONS:
  -P PASSWORD    password for accessing the application
 """
 
-def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outfile):
+def process(pattern, numlevels, edgeamount, brightness, saturation, infile, outfile):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
@@ -64,11 +64,11 @@ def cartoon(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
         tmpA1, '(', tmpA2, '-blur', '0x1', ')',
         '(', '-clone', '0', '-clone', '1', '-compose', 'over',
         '-compose', 'multiply', '-composite', '-modulate', brightness+','+saturation+',100', ')',
-        '(', '-clone', '0',] + setcspace + [
+        '(', '-clone', '0', setcspace,
         '-colorspace', 'gray', ')',
         '(', '-clone', '3', '-negate', '-blur', '0x'+str(edgewidth), ')',
 	  '(', '-clone', '3', '-clone', '4', '-compose', 'over', '-compose', 'colordodge', '-composite',
-        '-evaluate', 'pow', edgeamount, '-threshold', str(edgethresh)+'%'] + medproc + [
+        '-evaluate', 'pow', edgeamount, '-threshold', str(edgethresh)+'%', medproc,
         ')', '-delete', '0,1,3,4', '-compose', 'over', '-compose', 'multiply', '-composite', outfile]
 
     utl.run_im(opt)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     o = utl.get_args(USAGE)
 
-    cartoon(
+    process(
         pattern=o['-p'], numlevels=o['-n'], edgeamount=o['-e'],
         brightness=o['-b'], saturation=o['-s'],
         infile=o.get('INFILE'), outfile=o.get('OUTFILE'),)
