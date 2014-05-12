@@ -72,6 +72,6 @@ if __name__ == "__main__":
     o = utl.get_args(USAGE)
 
     process(
-        kind='desat', edge=o.get('-e', '4'), con=o.get('-c', '25'),
+        kind=o.get('-k', 'desat'), edge=o.get('-e', '4'), con=o.get('-c', '25'),
         sat=o.get('-s', '100'), gray=o.get('-g', False),
         infile=o.get('INFILE'), outfile=o.get('OUTFILE'))
