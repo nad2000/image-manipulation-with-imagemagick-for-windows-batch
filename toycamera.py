@@ -52,7 +52,7 @@ def process(infile, outfile, inner='0', outer='150', dark='0', feather='0', bri=
 
     ww, hh = utl.get_dim(tmpA1)
     wwo, hho = round(float(outer) * ww / 100, 4), round(float(outer) * hh / 100, 4)
-    mwh = round((outer) * min(ww, hh) / 100, 4)
+    mwh = round(float(outer) * min(ww, hh) / 100, 4)
 
     setcspace = utl.get_cspace_option()
     grayish = setcspace + ["-colorspace", "gray"] if gray else []
@@ -90,14 +90,12 @@ def process(infile, outfile, inner='0', outer='150', dark='0', feather='0', bri=
                     "{},50%".format(amt_), '+channel', tmpA1])
 
     utl.run_im([
-        '(' , tmpA1, '(', rolling1, ')', rolling2, contrasting, iblurring, sharpening, distorting ')',
+        '(' , tmpA1, '(', rolling1, ')', rolling2, contrasting, iblurring, sharpening, distorting, ')',
         '(', "+clone", oblurring, ')', '(', '-size', "{}x{}".format(mwh, mwh), "radial-gradient:", "-resize",
-         "{}x{}!".format(wwo, hho), "-gravity", "center", "-crop", "{}x{}+0+0".format(ww, hh), "+repage", ')',
-        '(', "+clone", mlevel, plevel, '-clamp $feathering $tinting \) \
-	\( -clone 1 -clone 0 -clone 2 $setcspace -clamp -compose over -composite $modulation \) \
-	-delete 0-2 +swap -compose multiply -composite $rolling3 $outfile
-
-    utl.run_im([tmpA1, '-brightness-contrast', "{},{}".format(bright, contrast), outfile])
+        "{}x{}!".format(wwo, hho), "-gravity", "center", "-crop", "{}x{}+0+0".format(ww, hh), "+repage", ')',
+        '(', "+clone", mlevel, plevel, "-clamp", feathering, tinting, ')',
+	    '(', "-clone", '1', "-clone", '0', "-clone", '2', setcspace, "-clamp", "-compose", "over", "-composite", modulation, ')',
+	    "-delete", "0-2", "+swap", "-compose", "multiply", "-composite", rolling3, outfile])
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 
@@ -106,7 +104,7 @@ if __name__ == "__main__":
     o = utl.get_args(USAGE)
 
     process(
-        inner=o.get('-i', '0'), outer=o.get('-o', '150')dark=o.get('-d', '0'), feather=o.get('-f', '0')
+        inner=o.get('-i', '0'), outer=o.get('-o', '150'), dark=o.get('-d', '0'), feather=o.get('-f', '0'),
         bri=o.get('-b', '0'), sat=o.get('-s', '0'), hue=o.get('-H', '0'), contr=o.get('-c', '0'),
         tint=o.get('-t', 'no tint'), amount=o.get('-a', '0'), sharp=o.get('-S', '0'),
         iblur=o.get('-I', '0'), oblur=o.get('-O', '0'), barrel=o.get('-B', '0'), gray=False,
