@@ -75,6 +75,21 @@ def get_dim(file_name):
     return tuple(
         map(int,subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
 
+
+def hsl_to_cspace(tinthue, tintsaturation, tintlightness, cspace):
+
+    tinthue, tintsaturation, tintlightness = map(lambda s: str(s) if type(s) is str else s, [tinthue, tintsaturation, tintlightness])
+    cmd = [IM_CMD, "-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
+        "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:"]
+    print ' '.join(cmd)
+    return (subprocess.check_output(cmd)).strip()
+
+
+def hsl_to_srgb(tinthue, tintsaturation, tintlightness):
+
+    return hsl_to_cspace(tinthue, tintsaturation, tintlightness, "sRGB")
+
+
 def get_cspace_option():
     """
     colorspace RGB and sRGB swapped between 6.7.5.5 and 6.7.6.7
@@ -137,9 +152,14 @@ def run_im(opt):
     cmd += flatten_list(opt)
 
     if verbose:
+        print '#' * 80,
         print ' '.join(cmd)
-
-    subprocess.call(cmd)
+        output = subprocess.check_output(cmd).strip()
+        if output:
+            print '-' * 80,
+            print output
+    else:
+        subprocess.call(cmd)
 
 
 def delete_tmp_files(*files):
