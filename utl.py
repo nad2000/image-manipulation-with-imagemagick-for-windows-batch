@@ -32,7 +32,7 @@ def get_args(usage):
         print o
 
     if o['-P'] != conf.PASSWORD:
-        #raise Exception("Wrong password! Access denied!")
+        # raise Exception("Wrong password! Access denied!")
         print "Wrong password! Access denied!"
         exit(-1)
 
@@ -41,6 +41,7 @@ def get_args(usage):
 #%%
 im_version = None
 
+
 def get_im_version():
     global im_version
     if im_version is None:
@@ -48,7 +49,7 @@ def get_im_version():
         version = version[version.find('LIB_VERSION_NUMBER'):]
         version = version[:version.find('\n')]
         version = version.split()[1]
-        version = ''.join(['0'+n if len(n) == 1 else n for n in version.split(',')])
+        version = ''.join(['0' + n if len(n) == 1 else n for n in version.split(',')])
         im_version = version
     return im_version
 
@@ -57,11 +58,11 @@ def get_colors(file_name):
 
     lines = subprocess.check_output([
         IM_CMD, file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
-        '-define','histogram:unique-colors=true','histogram:info:-'])
+        '-define', 'histogram:unique-colors=true', 'histogram:info:-'])
 
     return [map(
         int,
-        l[l.find('(')+1:l.find(')')].replace(' ', '').split(',')) for l in StringIO(lines) if '(' in l]
+        l[l.find('(') + 1:l.find(')')].replace(' ', '').split(',')) for l in StringIO(lines) if '(' in l]
 
 #%%
 
@@ -70,17 +71,18 @@ def color_num(file_name):
 
     return int(subprocess.check_output([IM_CMD, file_name, '-format', '"%k"', 'info:']).strip('"\' \t\n\r'))
 
+
 def get_dim(file_name):
 
     return tuple(
-        map(int,subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
+        map(int, subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
 
 
 def hsl_to_cspace(tinthue, tintsaturation, tintlightness, cspace):
 
     tinthue, tintsaturation, tintlightness = map(lambda s: str(s) if type(s) is str else s, [tinthue, tintsaturation, tintlightness])
     cmd = [IM_CMD, "-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
-        "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:"]
+           "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:"]
     print ' '.join(cmd)
     return (subprocess.check_output(cmd)).strip()
 
@@ -103,7 +105,7 @@ def get_cspace_option():
     The following was determined from various version tests using nightvision.
     with IM 6.7.4.10, 6.7.6.10, 6.8.3.2
     """
-    version  = get_im_version()
+    version = get_im_version()
 
     if (version < "06070607" or version > "06070707") and version <= "06080504":
         return ['-set', 'colorspace', 'RGB']
@@ -124,7 +126,7 @@ def get_cspace():
     The following was determined from various version tests using nightvision.
     with IM 6.7.4.10, 6.7.6.10, 6.8.3.2
     """
-    version  = get_im_version()
+    version = get_im_version()
 
     if (version < "06070607" or version > "06070707") and version <= "06080504":
         return 'RGB'
@@ -152,11 +154,11 @@ def run_im(opt):
     cmd += flatten_list(opt)
 
     if verbose:
-        print '#' * 80,
+        print '#' * 80
         print ' '.join(cmd)
         output = subprocess.check_output(cmd).strip()
         if output:
-            print '-' * 80,
+            print '-' * 80
             print output
     else:
         subprocess.call(cmd)
@@ -172,7 +174,7 @@ def delete_tmp_files(*files):
 
 
 def rgb_dist(c, m):
-    return sqrt(sum((_[0]-_[1])**2 for _ in zip(c,m)))
+    return sqrt(sum((_[0] - _[1]) ** 2 for _ in zip(c, m)))
 
 
 def lum(color):
@@ -185,6 +187,6 @@ def rgbl_dist(c, m):
     m_R, m_G, m_B = m
     return sqrt(
         (0.299 * ((c_R - m_R) ** 2)
-        + 0.587 * ((c_G - m_G) ** 2)
-        + 0.114 * ((c_B - m_B) ** 2)) * 0.75
+         + 0.587 * ((c_G - m_G) ** 2)
+         + 0.114 * ((c_B - m_B) ** 2)) * 0.75
         + (lum(c) - lum(m)) ** 2)
