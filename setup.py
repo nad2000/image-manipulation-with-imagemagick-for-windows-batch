@@ -12,7 +12,7 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '0.06'
+VERSION = '0.07'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
@@ -84,6 +84,8 @@ setup(
     url = WEBSITE,
     license = 'WTFPL',
     console = [
+        {'script': 'vintage1.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'vintage2.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage3.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'toycamera.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'crossprocess.py', 'icon_resources': [(1, 'app.ico')],},

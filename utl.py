@@ -190,3 +190,34 @@ def rgbl_dist(c, m):
          + 0.587 * ((c_G - m_G) ** 2)
          + 0.114 * ((c_B - m_B) ** 2)) * 0.75
         + (lum(c) - lum(m)) ** 2)
+
+
+def setup_vignette(file_name, vignetteshape, vignettesize, vignetterounding):
+    """setup vignette"""
+
+    ww, hh = get_dim( file_name)
+
+    vignetteshape = vignetteshape.lower()[0]
+    if vignetteshape in ["v", "h"]:  # "vertical", "horizontal"
+
+        run_im(["-size", str(ww) + 'x' + str(hh), "xc:black", "-crop",
+                    "100x" + vignettesize + "+0+0%" if vignetteshape == "v" else vignettesize + "x100+0+0%",
+                    "+repage", "-background", "white", "-gravity", "center", "-extent", str(ww) + 'x' + str(hh),
+                    "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", file_name])
+
+    elif vignetteshape == "r":  # "roundrectangle"
+
+        xc, yc = ww / 2., hh / 2.
+        ww2, hh2 = str(int(vignettesize) * ww / 200.), str(int(vignettesize) * hh / 200.)
+        rounding = str(min(ww, hh) * int(vignetterounding) / 100.)
+        run_im(["-size", str(ww) + 'x' + str(hh), "xc:white", "-fill", "black",
+                    "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
+                    xc, yc, ww2, hh2, ww2, hh2, rounding, rounding),
+                    "-alpha", "off", "-morphology", "Distance", "Euclidean:4", "-auto-level", "-negate", file_name])
+
+
+def add_vignette(file_name, vignette, vignettelighten):
+    """add vignette"""
+
+    run_im([file_name, '(', vignette, "+level", vignettelighten + "x100%", "-blur", "0x5", ')',
+                "-compose", "multiply", "-composite", file_name])
