@@ -48,7 +48,7 @@ def process(infile, outfile, inner='0', outer='150', dark='0', feather='0', bri=
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
     # test input image
-    utl.run_im(['-quiet', '-regard-warnings', infile, '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
     ww, hh = utl.get_dim(tmpA1)
     wwo, hho = round(float(outer) * ww / 100, 4), round(float(outer) * hh / 100, 4)
@@ -86,16 +86,16 @@ def process(infile, outfile, inner='0', outer='150', dark='0', feather='0', bri=
     	rolling2 = setcspace + ["-compose", "blend", "-define", "compose:args=50,50", "-composite", "-compose", "over"]
     	axroll, ayroll = abs(int(xroll)), abs(int(yroll))
     	rolling3 = ["-shave", "{}x{}".format(axroll, ayroll)]
-        utl.run_im([tmpA1, '-channel', color, ('+' if amt < 0 else '-') + 'sigmoidal-contrast',
-                    "{},50%".format(amt_), '+channel', tmpA1])
+        utl.run_im(tmpA1, '-channel', color, ('+' if amt < 0 else '-') + 'sigmoidal-contrast',
+                    "{},50%".format(amt_), '+channel', tmpA1)
 
-    utl.run_im([
+    utl.run_im(
         '(' , tmpA1, '(', rolling1, ')', rolling2, contrasting, iblurring, sharpening, distorting, ')',
         '(', "+clone", oblurring, ')', '(', '-size', "{}x{}".format(mwh, mwh), "radial-gradient:", "-resize",
         "{}x{}!".format(wwo, hho), "-gravity", "center", "-crop", "{}x{}+0+0".format(ww, hh), "+repage", ')',
         '(', "+clone", mlevel, plevel, "-clamp", feathering, tinting, ')',
 	    '(', "-clone", '1', "-clone", '0', "-clone", '2', setcspace, "-clamp", "-compose", "over", "-composite", modulation, ')',
-	    "-delete", "0-2", "+swap", "-compose", "multiply", "-composite", rolling3, outfile])
+	    "-delete", "0-2", "+swap", "-compose", "multiply", "-composite", rolling3, outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 

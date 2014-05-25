@@ -33,7 +33,7 @@ def process(infile, outfile, ramt='0', gamt='0', bamt='0', bright='0', contrast=
     div = 5
 
     # test input image
-    utl.run_im(['-quiet', '-regard-warnings', infile, '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
     for color, amt in dict(R=int(ramt), G=int(gamt), B=int(bamt)).iteritems():
         if amt == 0:
@@ -41,10 +41,11 @@ def process(infile, outfile, ramt='0', gamt='0', bamt='0', bright='0', contrast=
 
         amt_ = round(abs(amt) / div, 4)
 
-        utl.run_im([tmpA1, '-channel', color, ('+' if amt < 0 else '-') + 'sigmoidal-contrast',
-                    "{},50%".format(amt_), '+channel', tmpA1])
+        utl.run_im(
+            tmpA1, '-channel', color, ('+' if amt < 0 else '-') + 'sigmoidal-contrast',
+            "{},50%".format(amt_), '+channel', tmpA1)
 
-    utl.run_im([tmpA1, '-brightness-contrast', "{},{}".format(bright, contrast), outfile])
+    utl.run_im(tmpA1, '-brightness-contrast', "{},{}".format(bright, contrast), outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 

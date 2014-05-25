@@ -30,12 +30,10 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
     tmpM = tempfile.mktemp(suffix='.mpc')
 
     # test input image
-    utl.run_im([
-        '-quiet', '-regard-warnings', infile, '-alpha', 'off', '+repage', '-depth', '8', tmpA])
+    utl.run_im('-quiet', '-regard-warnings', infile, '-alpha', 'off', '+repage', '-depth', '8', tmpA)
 
     # test color table mapfile image
-    utl.run_im([
-        '-quiet', '-regard-warnings', mapfile, '-alpha', 'off', '+repage', '-depth', '8', tmpM])
+    utl.run_im('-quiet', '-regard-warnings', mapfile, '-alpha', 'off', '+repage', '-depth', '8', tmpM)
 
     mapcolor_arr = utl.get_colors(tmpM)
     nmapcolors = len(mapcolor_arr)
@@ -51,7 +49,7 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
     else:
         ncolors = int(ncolors)
 
-    utl.run_im([tmpA, '+dither', '-colors', str(ncolors), '-depth', '8', tmpA])
+    utl.run_im(tmpA, '+dither', '-colors', str(ncolors), '-depth', '8', tmpA)
 
     # get number of reduced rgb image colors
     color_arr = utl.get_colors(tmpA)
@@ -61,7 +59,7 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
         print "number of reduced colors =", ncolors
 
     # output color reduced image for testing
-    utl.run_im([tmpA, infile + '_remap_reduced.png'])
+    utl.run_im(tmpA, infile + '_remap_reduced.png')
 
     if metric.lower() == "rgb":
         pairlist = [(c, min(mapcolor_arr, key=lambda m: utl.rgb_dist(c, m))) for c in color_arr]
@@ -76,18 +74,18 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
 
     tmpO = tempfile.mktemp(suffix='.mpc')
 
-    utl.run_im(['-size', '{}x{}'.format(*utl.get_dim(tmpA)), 'xc:none', '-depth', '8', tmpO])
+    utl.run_im('-size', '{}x{}'.format(*utl.get_dim(tmpA)), 'xc:none', '-depth', '8', tmpO)
 
     for idx, (c, m) in enumerate(pairlist, 1):
 
         c_rgb, m_rgb = "rgb({},{},{})".format(*c), "rgb({},{},{})".format(*m)
         if show:
             print "{}: {} to {}".format(idx, c_rgb, m_rgb)
-        utl.run_im([
+        utl.run_im(
             '(', tmpA, '+transparent', c_rgb, '-fill', m_rgb, '-opaque', c_rgb, ')',
-            tmpO, '-composite', tmpO])
+            tmpO, '-composite', tmpO)
 
-        utl.run_im([tmpO, outfile])
+        utl.run_im(tmpO, outfile)
 
     if show:
         print "\nFinal colors:"

@@ -50,17 +50,15 @@ def process(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
     else:
         medproc = ['-median', '3']
 
-    utl.run_im([
+    utl.run_im(
         '-quiet', '-regard-warnings', infile, '+repage', '-depth', '8',
-        '-selective-blur', '0x5+10%', tmpA1])
+        '-selective-blur', '0x5+10%', tmpA1)
 
     # convert to grayscale and posterize to create mask image
-    opt = [tmpA1, '-level', '0x'+pattern+'%'] +  setcspace + ['-colorspace', 'gray',
-        '-posterize', numlevels, '-depth', '8',] + proc + [tmpA2]
-    utl.run_im(opt)
+    utl.run_im(tmpA1, '-level', '0x'+pattern+'%', setcspace, '-colorspace', 'gray',
+               '-posterize', numlevels, '-depth', '8', proc, tmpA2)
 
-
-    opt =  [
+    utl.run_im(
         tmpA1, '(', tmpA2, '-blur', '0x1', ')',
         '(', '-clone', '0', '-clone', '1', '-compose', 'over',
         '-compose', 'multiply', '-composite', '-modulate', brightness+','+saturation+',100', ')',
@@ -69,9 +67,7 @@ def process(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
         '(', '-clone', '3', '-negate', '-blur', '0x'+str(edgewidth), ')',
 	  '(', '-clone', '3', '-clone', '4', '-compose', 'over', '-compose', 'colordodge', '-composite',
         '-evaluate', 'pow', edgeamount, '-threshold', str(edgethresh)+'%', medproc,
-        ')', '-delete', '0,1,3,4', '-compose', 'over', '-compose', 'multiply', '-composite', outfile]
-
-    utl.run_im(opt)
+        ')', '-delete', '0,1,3,4', '-compose', 'over', '-compose', 'multiply', '-composite', outfile)
 
     utl.delete_tmp_files(tmpA1, tmpA2, tmpB1, tmpB2)
 

@@ -30,7 +30,7 @@ def process(infile, outfile, kind='desat', edge='4', con='25', sat='100', gray=F
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
     # test input image
-    utl.run_im(['-quiet', '-regard-warnings', infile, '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
     if kind == "gray" or kind == 'g':
         grayscaling = ["-colorspace", "gray"]
@@ -63,7 +63,7 @@ def process(infile, outfile, kind='desat', edge='4', con='25', sat='100', gray=F
         '(', '-clone', '0', '-modulate', '100,' + str(sat) + ',100', ')',
         '-delete', '0-4', setcspace, '-compose', 'screen', '-composite', outfile]
 
-    utl.run_im(opt)
+    utl.run_im(*opt)
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 

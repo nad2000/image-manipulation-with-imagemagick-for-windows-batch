@@ -3,6 +3,7 @@
 import subprocess
 import os
 import sys
+import tempfile
 from docopt import docopt
 from cStringIO import StringIO
 from math import sqrt
@@ -54,15 +55,9 @@ def get_im_version():
     return im_version
 
 
-def get_colors(file_name):
+def get_file_colorspace(file_name):
 
-    lines = subprocess.check_output([
-        IM_CMD, file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
-        '-define', 'histogram:unique-colors=true', 'histogram:info:-'])
-
-    return [map(
-        int,
-        l[l.find('(') + 1:l.find(')')].replace(' ', '').split(',')) for l in StringIO(lines) if '(' in l]
+    return subprocess.check_output([IM_CMD, file_name, '-ping', '-format', '%[colorspace]', 'info:']).strip()
 
 #%%
 
@@ -139,6 +134,8 @@ def get_cspace():
 def flatten_list(tree):
     thelist = []
     for e in tree:
+        if e is None:
+            continue
         if not isinstance(e, (list, tuple)):
             thelist += [e]
         else:
@@ -146,22 +143,52 @@ def flatten_list(tree):
     return thelist
 
 
-def run_im(opt):
+def run_im(*args, **kwargs):
 
     global verbose
 
     cmd = [IM_CMD]
-    cmd += flatten_list(opt)
+    cmd += flatten_list(args)
 
     if verbose:
         print '#' * 80
         print ' '.join(cmd)
-        output = subprocess.check_output(cmd).strip()
-        if output:
-            print '-' * 80
-            print output
-    else:
-        subprocess.call(cmd)
+
+    output = subprocess.check_output(cmd, **kwargs)
+    if output:
+        output = output.strip()
+
+    if verbose and output:
+        print '-' * 80
+        print output
+
+    return output
+
+
+def open_im(*args, **kwargs):
+
+    global verbose
+
+    cmd = [IM_CMD]
+    cmd += flatten_list(args)
+
+    if verbose:
+        print '#' * 80
+        print ' '.join(cmd)
+
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, **kwargs)
+
+    return proc.stdout
+
+
+def get_colors(file_name):
+
+    with open_im(file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
+        '-define', 'histogram:unique-colors=true', 'histogram:info:-') as lines:
+
+        return [map(
+            int,
+            l[l.find('(') + 1:l.find(')')].replace(' ', '').split(',')) for l in lines if '(' in l]
 
 
 def delete_tmp_files(*files):
@@ -200,24 +227,63 @@ def setup_vignette(file_name, vignetteshape, vignettesize, vignetterounding):
     vignetteshape = vignetteshape.lower()[0]
     if vignetteshape in ["v", "h"]:  # "vertical", "horizontal"
 
-        run_im(["-size", str(ww) + 'x' + str(hh), "xc:black", "-crop",
-                    "100x" + vignettesize + "+0+0%" if vignetteshape == "v" else vignettesize + "x100+0+0%",
-                    "+repage", "-background", "white", "-gravity", "center", "-extent", str(ww) + 'x' + str(hh),
-                    "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", file_name])
+        run_im("-size", str(ww) + 'x' + str(hh), "xc:black", "-crop",
+                "100x" + vignettesize + "+0+0%" if vignetteshape == "v" else vignettesize + "x100+0+0%",
+                "+repage", "-background", "white", "-gravity", "center", "-extent", str(ww) + 'x' + str(hh),
+                "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", file_name)
 
     elif vignetteshape == "r":  # "roundrectangle"
 
         xc, yc = ww / 2., hh / 2.
         ww2, hh2 = str(int(vignettesize) * ww / 200.), str(int(vignettesize) * hh / 200.)
         rounding = str(min(ww, hh) * int(vignetterounding) / 100.)
-        run_im(["-size", str(ww) + 'x' + str(hh), "xc:white", "-fill", "black",
-                    "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
-                    xc, yc, ww2, hh2, ww2, hh2, rounding, rounding),
-                    "-alpha", "off", "-morphology", "Distance", "Euclidean:4", "-auto-level", "-negate", file_name])
+        run_im("-size", str(ww) + 'x' + str(hh), "xc:white", "-fill", "black",
+               "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
+               xc, yc, ww2, hh2, ww2, hh2, rounding, rounding),
+               "-alpha", "off", "-morphology", "Distance", "Euclidean:4", "-auto-level", "-negate", file_name)
 
 
 def add_vignette(file_name, vignette, vignettelighten):
     """add vignette"""
 
-    run_im([file_name, '(', vignette, "+level", vignettelighten + "x100%", "-blur", "0x5", ')',
-                "-compose", "multiply", "-composite", file_name])
+    run_im(file_name, '(', vignette, "+level", vignettelighten + "x100%", "-blur", "0x5", ')',
+           "-compose", "multiply", "-composite", file_name)
+
+
+def make_pached(input_file, output_file, color_map_file):
+
+    global verbose
+
+    version = get_im_version()
+    ww, hh = get_dim(input_file)
+    process_test = "getColors" in run_im("-list", "module")
+
+    if version >= "06080310":
+
+        with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
+                    "-compose", "copy_opacity", "-composite", "sparse-color:-") as out:
+            run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color",
+                    "voronoi", "@-", output_file, stdin=out)
+
+    elif version < "06060210" or  not process_test:
+
+        with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
+                    "-compose", "copy_opacity", "-composite", "-monitor", "txt:-") as out:
+
+            tmpC2 = tempfile.mktemp(suffix='.txt')
+
+            with open(tmpC2, 'w') as tmp:
+                for line in out:
+                    line = line.strip()
+                    if line and line[0] != '#' and " 0) " not in line:
+                        print >>tmp, line[:line.find(':')] + ',' + line[line.rfind(" ")+1:]
+
+
+            run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
+                   "@" + tmpC2, "+monitor", output_file)
+
+    else:
+        run_im(input_file, "(", "-background","black", color_map_file, ")", "-alpha", "off",
+                "-compose", "copy_opacity", "-composite", input_file)
+        with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:") as out:
+            run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi", "@-", output_file, stdin=out)

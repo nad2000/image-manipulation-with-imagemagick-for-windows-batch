@@ -30,8 +30,7 @@ def process(infile, outfile, inner=0, outer=150, feather=0, color='black', amoun
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
     # test input image
-    utl.run_im([
-        '-quiet', '-regard-warnings', infile, '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
     ww, hh = utl.get_dim(tmpA1)
     wwo, hho = float(outer) * ww / 100, float(outer) * hh / 100
@@ -55,13 +54,13 @@ def process(infile, outfile, inner=0, outer=150, feather=0, color='black', amoun
     else:
         feathering = ['-blur', feather + "x65000"]
 
-    utl.run_im([
+    utl.run_im(
         '-background', color, tmpA1,
         '(', '-size', "{}x{}".format(mwh, mwh), 'radial-gradient:',
         '-resize',  "{:.0f}x{:.0f}!".format(wwo, hho), '-gravity', 'center',
-        '-crop', "{}x{}+0+0".format(ww, hh), '+repage',] + mlevel + plevel + feathering
-        + [')'] + utl.get_cspace_option() + ['-alpha', 'off', '-compose', 'copy_opacity', '-composite',
-         '-compose', 'over', '-flatten', outfile])
+        '-crop', "{}x{}+0+0".format(ww, hh), '+repage', mlevel, plevel, feathering,
+        ')', utl.get_cspace_option(), '-alpha', 'off', '-compose', 'copy_opacity', '-composite',
+         '-compose', 'over', '-flatten', outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 

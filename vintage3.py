@@ -86,16 +86,16 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
         graycorrect = []
 
     # test input image
-    utl.run_im(['-quiet', '-regard-warnings', infile, '-auto-level', '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '-auto-level', '+repage', tmpA1)
 
     ww, hh = utl.get_dim(tmpA1)
 
     if backgroundfile:
-        utl.run_im(['-quiet', '-regard-warnings', backgroundfile, '+repage', tmpA2])
+        utl.run_im('-quiet', '-regard-warnings', backgroundfile, '+repage', tmpA2)
 
     # convert to grayscale
     # note: from vintage1 and vintage2, we need to feed the noise processing a non-linear gray image
-    utl.run_im([tmpA1, setcspace, '-colorspace', 'gray', '-set', 'colorspace', 'sRGB', tmpA1])
+    utl.run_im(tmpA1, setcspace, '-colorspace', 'gray', '-set', 'colorspace', 'sRGB', tmpA1)
 
     # add noise
     if noiseamount != "0":
@@ -104,8 +104,8 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
         # for the next two sections regarding adding noise and vertical noise to work correctly -- very strange
         # this changed between 6.8.3.8 and 6.8.3.9
         # due to changes in -colorspace gray when -intensity was being introduced and debugged
-        utl.run_im([tmpA1, '-seed', str(noiseseed), '-attenuate', str(noiseamount), '+noise', 'gaussian',
-                    setcspace, '-colorspace', 'gray', '-set', 'colorspace', 'sRGB', tmpA1])
+        utl.run_im(tmpA1, '-seed', str(noiseseed), '-attenuate', str(noiseamount), '+noise', 'gaussian',
+            setcspace, '-colorspace', 'gray', '-set', 'colorspace', 'sRGB', tmpA1)
 
     # add vertical noise
     if verticalnoiseamt != "0":
@@ -113,47 +113,44 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
         # (bug driven) lower contrast results from versions 6.8.3.10 through 6.8.4.4
         # could have used gray50, but decided to keep gray(50%) and add -colorspoce sRGB
         # which does not seem to alter results prior to 6.7.7.7
-        utl.run_im([tmpA1,
-                    '(', '-size', str(ww) + "x1", 'xc:gray(50%)', "-set", "colorspace", "sRGB",
-                    "-seed", str(vertnoiseseed), "-attenuate", "15", "+noise", "uniform",
-                    setcspace, "-colorspace", "gray", "-resize", "{}x{}!".format(ww, hh),
-                    "-alpha", "set", "-channel", "A", "-evaluate", "set", verticalnoiseamt.strip() + '%', "+channel", ')',
-                    "-compose", "overlay", "-composite", tmpA1])
+        utl.run_im(tmpA1, '(', '-size', str(ww) + "x1", 'xc:gray(50%)', "-set", "colorspace", "sRGB",
+            "-seed", str(vertnoiseseed), "-attenuate", "15", "+noise", "uniform",
+            setcspace, "-colorspace", "gray", "-resize", "{}x{}!".format(ww, hh),
+            "-alpha", "set", "-channel", "A", "-evaluate", "set", verticalnoiseamt.strip() + '%', "+channel", ')',
+            "-compose", "overlay", "-composite", tmpA1)
 
     # add banding
     if bandingamt != "0":
-        utl.run_im([tmpA1,
-                    '(', "-size", str(ww) + "x1", "-seed", str(bandseed), "plasma:fractal",
-                    setcspace, "-colorspace", "gray", "-blur", "0x" + str(bandingwidth), "-resize", "{}x{}!".format(ww, hh),
-                    "-auto-level", "-alpha", "set", "-channel", 'A', "-evaluate", "set",  bandingamt + '%', "+channel", ')',
-                    "-compose", "overlay", "-composite", tmpA1])
+        utl.run_im(tmpA1, '(', "-size", str(ww) + "x1", "-seed", str(bandseed), "plasma:fractal",
+            setcspace, "-colorspace", "gray", "-blur", "0x" + str(bandingwidth), "-resize", "{}x{}!".format(ww, hh),
+            "-auto-level", "-alpha", "set", "-channel", 'A', "-evaluate", "set",  bandingamt + '%', "+channel", ')',
+            "-compose", "overlay", "-composite", tmpA1)
 
     # add background image
     if backgroundfile is not None:
 
-        utl.run_im([tmpA1,
-                    '(', tmpA2, "-resize", "{}x{}!".format(ww, hh), "-alpha", "set", "-channel", 'A',
-                    "-evaluate", "set", backgroundamt + '%', "+channel", ')',
-                    "-compose", "overlay", "-composite", tmpA1])
+        utl.run_im(tmpA1, '(', tmpA2, "-resize", "{}x{}!".format(ww, hh), "-alpha", "set", "-channel", 'A',
+            "-evaluate", "set", backgroundamt + '%', "+channel", ')',
+            "-compose", "overlay", "-composite", tmpA1)
 
     # process for color change
     # note tintcolor needs -colorspace sRGB to make imo, im6 and im produce same colors
     tinthue = round(int(tinthue) * 100. / 360, 4)
     tintcolor = utl.hsl_to_srgb(tinthue, tintsaturation, tintlightness)
 
-    utl.run_im([tmpA1, setcspace,
-                '(', "-clone", '0', "-fill", tintcolor,  graycorrect, "-tint", "100%",
-                "-alpha", "set", "-channel", 'A', "-evaluate", "set", str(tintamount) + '%', "+channel", ')',
-                "-compose", "over", "-composite", "-brightness-contrast", brightness + 'x' + contrast, tmpA1])
+    utl.run_im(tmpA1, setcspace,
+        '(', "-clone", '0', "-fill", tintcolor,  graycorrect, "-tint", "100%",
+        "-alpha", "set", "-channel", 'A', "-evaluate", "set", str(tintamount) + '%', "+channel", ')',
+        "-compose", "over", "-composite", "-brightness-contrast", brightness + 'x' + contrast, tmpA1)
 
     # setup vignette
     size_option = ["-size", str(ww) + 'x' + str(hh)]
     if vignetteshape in ["vertical", "horizontal"]:
 
-        utl.run_im([size_option, "xc:black", "-crop",
-                    "100x" + vignettesize + "+0+0%" if vignetteshape == "vertical" else vignettesize + "x100+0+0%",
-                    "+repage", "-background", "white", "-gravity", "center", "-extent", size_option,
-                    "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", tmpA2])
+        utl.run_im(size_option, "xc:black", "-crop",
+            "100x" + vignettesize + "+0+0%" if vignetteshape == "vertical" else vignettesize + "x100+0+0%",
+            "+repage", "-background", "white", "-gravity", "center", "-extent", size_option,
+            "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", tmpA2)
 
     elif vignetteshape == "roundrectangle":
 
@@ -161,35 +158,34 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
         ww2, hh2 = str(int(vignettesize) * ww / 50.), str(int(vignettesize) * hh / 50.)
         rounding = str(min(ww, hh) * int(vignetterounding) / 100.)
 
-        utl.run_im([size_option, "xc:white", "-fill", "black",
-                    "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
-                    xc, yc, ww2, hh2, ww2, hh2, rounding, rounding),
-                    "-alpha", "off", "-morphology", "Distance", "Euclidean:4", "-auto-level", "-negate", tmpA2])
+        utl.run_im(size_option, "xc:white", "-fill", "black",
+            "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
+            xc, yc, ww2, hh2, ww2, hh2, rounding, rounding),
+            "-alpha", "off", "-morphology", "Distance", "Euclidean:4", "-auto-level", "-negate", tmpA2)
 
     # add vignette
     if vignetteshape != "none":
         vignettecolor = utl.hsl_to_cspace(tinthue, vignettesaturation, vignettelightness, utl.get_cspace())
-        utl.run_im([tmpA1,
-                    '(', tmpA2, "+level-colors", vignettecolor + ",white", "+level", vignettelighten + "x100%", "-blur", "0x5", ')',
-                    "-compose", "multiply", "-composite", tmpA1])
+        utl.run_im(tmpA1,
+            '(', tmpA2, "+level-colors", vignettecolor + ",white", "+level", vignettelighten + "x100%", "-blur", "0x5", ')',
+            "-compose", "multiply", "-composite", tmpA1)
 
     # add border/frame
     if bordertype == "torn":
         psize = borderwidth + tornpad
 
-        utl.run_im([tmpA1,
-                    "(", "-clone", "0", "-fill", bordercolor, "-colorize", "100%", ")",
-                    "(", "-clone", "0", "-fill", "white", "-colorize", "100%", "-shave",  psize +
-                    'x' + psize, "-bordercolor", "black", "-border", psize, ")",
-                    "(", "-clone", "0", "-seed", tornseed, "+noise", "Random", "-blur", "0x" + torncurviness,
-                    setcspace, "-colorspace", "gray", "-auto-level",
-                    "-channel", "R", "-evaluate", "sine", torndensity,
-                    "-channel", "G", "-evaluate", "cosine", torndensity,
-                    "-channel", "RG", "-separate", "-clone", "2", "-insert", "0",
-                    "-define", "compose:args={}x{}".format(borderwidth, borderwidth),
-                    "-compose", "displace", "-composite", "-spread", tornroughness,  "-blur", tornroughness + "0x0.7", ")",
-                    "-delete", "2", "-swap", "0,1", "-compose", "over", "-composite", "-trim", "+repage",
-                    "-gravity", "center", "-background", bordercolor, "-extent", "{}x{}".format(ww, hh), tmpA1])
+        utl.run_im(tmpA1, "(", "-clone", "0", "-fill", bordercolor, "-colorize", "100%", ")",
+            "(", "-clone", "0", "-fill", "white", "-colorize", "100%", "-shave",  psize +
+            'x' + psize, "-bordercolor", "black", "-border", psize, ")",
+            "(", "-clone", "0", "-seed", tornseed, "+noise", "Random", "-blur", "0x" + torncurviness,
+            setcspace, "-colorspace", "gray", "-auto-level",
+            "-channel", "R", "-evaluate", "sine", torndensity,
+            "-channel", "G", "-evaluate", "cosine", torndensity,
+            "-channel", "RG", "-separate", "-clone", "2", "-insert", "0",
+            "-define", "compose:args={}x{}".format(borderwidth, borderwidth),
+            "-compose", "displace", "-composite", "-spread", tornroughness,  "-blur", tornroughness + "0x0.7", ")",
+            "-delete", "2", "-swap", "0,1", "-compose", "over", "-composite", "-trim", "+repage",
+            "-gravity", "center", "-background", bordercolor, "-extent", "{}x{}".format(ww, hh), tmpA1)
 
     elif bordertype in ["round", "rounded"]:
 
@@ -200,7 +196,7 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
 
         rounding = round(min(ww, hh) * int(borderrounding) / 100., 5)
 
-        utl.run_im([
+        utl.run_im(
             tmpA1, "(", "-clone", "0", aproc, "-separate", "+channel",
             "(", "-size", "{0}x{0}".format(rounding), "xc:black", "-draw", "fill white circle {0},{0} {0},0".format(
                 rounding), "-alpha", "off", "-write", "mpr:arc", "+delete", ")",
@@ -210,9 +206,9 @@ def process(infile, outfile, tinthue, tintsaturation, tintamount, brightness,
             "(", "mpr:arc", "-rotate", "180", ")", "-gravity", "southeast", "-composite", ")",
             "-clone", "0", "-clone", "1", "-alpha", "off", "-compose", "copy_opacity", "-composite",
             "-background", bordercolor, "-compose", "over", "-flatten",
-            "-bordercolor", bordercolor, "-border", borderwidth, tmpA1])
+            "-bordercolor", bordercolor, "-border", borderwidth, tmpA1)
 
-    utl.run_im([tmpA1, outfile])
+    utl.run_im(tmpA1, outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2)
 

@@ -26,20 +26,20 @@ def process(infile, outfile, lowpt='0', highpt='100'):
     tmpB1 = tempfile.mktemp(suffix='.cache')
 
     # test input image
-    utl.run_im([
+    utl.run_im(
         '-quiet', '-regard-warnings', infile, utl.get_cspace_option(),
-        '-colorspace', 'gray', '+repage', tmpA1])
+        '-colorspace', 'gray', '+repage', tmpA1)
 
     #convert lowpt and highpt to range and offset
     range_ = int(round(1000 * (int(highpt) - int(lowpt)) / 100., 0))
     offset = int(round(1000 * int(lowpt) / 100., 0))
 
     # note added $setcspace before -clut to fix bug between 6.8.4.0 and 6.8.4.10
-    utl.run_im([
+    utl.run_im(
         tmpA1, '(', '-size','1x1', 'xc:blueviolet', 'xc:blue', 'xc:cyan', 'xc:green1', 'xc:yellow', 'xc:orange', 'xc:red',
         '+append', '-filter', 'Cubic', '-resize', '1000x1!', '-crop',
         "{}x{}+{}+0".format(range_, range_, offset), '+repage', '-resize', '1000x1!', ')',
-        utl.get_cspace_option(), '-clut', outfile])
+        utl.get_cspace_option(), '-clut', outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1)
 

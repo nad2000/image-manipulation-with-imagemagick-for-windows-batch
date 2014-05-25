@@ -40,8 +40,7 @@ def process(infile, outfile, brightness='100', diameter='60', rolloff='0',
     setcspace = utl.get_cspace_option()
 
     # test input image
-    utl.run_im([
-        '-quiet', '-regard-warnings', infile, '+repage', tmpA1])
+    utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
     ww, hh = utl.get_dim(tmpA1)
     # compute half and get centre
@@ -65,30 +64,31 @@ def process(infile, outfile, brightness='100', diameter='60', rolloff='0',
     else:
         lighten = []
 
-    utl.run_im(['(', tmpA1, lighten, '-attenuate', noise, '-seed', seed, '+noise', 'gaussian',]
-        + setcspace + ['-colorspace', 'gray', ')',
+    utl.run_im('(', tmpA1, lighten, '-attenuate', noise, '-seed', seed, '+noise', 'gaussian',
+        setcspace, '-colorspace', 'gray', ')',
         '(', '-clone', '0', '-fill', 'green1', '-colorize', str(brightness) + '%', ')',
         '-compose', 'multiply', '-composite',
         '(', '-clone', '0', '-fill', 'white', '-colorize', '100%', '-fill', 'black',
         '-draw', "translate {},{} ellipse ".format(xc, yc) + args, '-alpha', 'off', '-morphology',
         'Distance', 'Euclidean:4', '-auto-level', leveling, ')',
         '(', '-clone','0', '-fill', 'black', '-colorize', '100%', ')',
-        '+swap', '-compose', 'over', '-composite', tmpA2])
+        '+swap', '-compose', 'over', '-composite', tmpA2)
 
     if blooming:
         # get mask of top percent brightness
         # blur mask
         # apply as mask to overlay white
-        utl.run_im([tmpA1, tmpA2,
+        utl.run_im(tmpA1, tmpA2,
             '(', '-clone', '0', '-fill', 'white', '-colorize', '100%', ')',
             '(', '-clone', '0', '-colorspace', 'HSB', '-channel', 'B', '-separate', '+channel',
                 '-contrast-stretch', '0,' + threshold + '%',
                 '-fill', 'black', '+opaque', 'white', '-blur', '0x2', ')',
-                '-delete', '0', '-compose', 'over', '-composite', outfile])
+                '-delete', '0', '-compose', 'over', '-composite', outfile)
     else:
-        utl.run_im([tmpA2, outfile])
+        utl.run_im(tmpA2, outfile)
 
     utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2)
+
 
 if __name__ == "__main__":
 
