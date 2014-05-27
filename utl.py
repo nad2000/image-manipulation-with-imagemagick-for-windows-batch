@@ -270,17 +270,24 @@ def make_pached(input_file, output_file, color_map_file):
         with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
                     "-compose", "copy_opacity", "-composite", "-monitor", "txt:-") as out:
 
-            tmpC2 = tempfile.mktemp(suffix='.txt')
 
-            with open(tmpC2, 'w') as tmp:
-                for line in out:
-                    line = line.strip()
-                    if line and line[0] != '#' and " 0) " not in line:
-                        print >>tmp, line[:line.find(':')] + ',' + line[line.rfind(" ")+1:]
+            cmd = [IM_CMD, "-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
+                   "@-", "+monitor", output_file]
+            if verbose:
+                print '#'*80
+                print ' '.join(cmd)
 
+            p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+            print "\nProgress:\n"
 
-            run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
-                   "@" + tmpC2, "+monitor", output_file)
+            pipe = p.stdin
+            for line in out:
+                line = line.strip()
+                if line and line[0] != '#' and " 0) " not in line:
+                    print >>pipe, line[:line.find(':')] + ',' + line[line.rfind(" ")+1:]
+
+            pipe.close()
+            p.wait()
 
     else:
         run_im(input_file, "(", "-background","black", color_map_file, ")", "-alpha", "off",

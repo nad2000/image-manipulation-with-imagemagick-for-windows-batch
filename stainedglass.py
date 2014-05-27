@@ -56,9 +56,9 @@ def process(
     tmpB2 = tempfile.mktemp(suffix='.cache')
     tmpA3 = tempfile.mktemp(suffix='.mpc')
     tmpB3 = tempfile.mktemp(suffix='.cache')
-    tmpC = tempfile.mktemp(suffix='.txt')
-    tmpG = tempfile.mktemp(suffix='.txt')
-    tmpC2 = tempfile.mktemp(suffix='.txt')
+    tmpC = tempfile.mktemp(suffix='_C.txt')
+    tmpG = tempfile.mktemp(suffix='_G.txt')
+    tmpC2 = tempfile.mktemp(suffix='_C2.txt')
 
 
 
@@ -114,10 +114,12 @@ def process(
     offset = int(offset)
 
     with open(tmpC, 'w') as cf, open(tmpG, 'w') as gf:
+
+        print >>cf, "# ImageMagick pixel enumeration: {},{},255,rgb\n".format(ww, hh)
+
         if kind in ["random", "r"]:
             y = k = 0
             offset += 1
-            print >>cf, "# ImageMagick pixel enumeration: {},{},255,rgb\n".format(ww, hh)
 
             while y < hh2:
 
@@ -137,10 +139,10 @@ def process(
                     if yy < 0: yy = 0
                     if yy > hh1: yy = hh1
 
-                    g = 100.0 * k / qrange
+                    g = round(100.0 * k / qrange, 8)
 
                     print >>cf, "{},{}: (255,255,255)".format(xx, yy)
-                    print >>gf, "{},{} gray({}%)".format(xx, yy, g)
+                    print >>gf, "{} {} gray({}%)".format(xx, yy, g)
                     x += size
                     k += 1
 
@@ -158,10 +160,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = 100.0 * k / qrange
+                    g = round(100.0 * k / qrange, 8)
 
                     print >>cf, "{},{}: (255,255,255)".format(x, y)
-                    print >>gf, "{},{} gray({}%)".format(x, y, g)
+                    print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
 
@@ -181,10 +183,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = 100.0 * k / qrange
+                    g = round(100.0 * k / qrange, 8)
 
                     print >>cf, "{},{}: (255,255,255)".format(x, y)
-                    print >>gf, "{},{} gray({}%)".format(x, y, g)
+                    print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
 
