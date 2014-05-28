@@ -27,6 +27,10 @@ def get_args(usage):
         verbose = True
         sys.argv.pop(sys.argv.index("--verbose"))
 
+    # if -P option is absent, exit quietly
+    if "-P" not in sys.argv:
+        exit(-1)
+
     o = docopt(usage)
     if verbose:
         print "Options:"

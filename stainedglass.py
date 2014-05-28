@@ -205,9 +205,8 @@ def process(
         run_im(tmpA2, tmpA3, "-alpha", "off", "-compose", "copy_opacity", "-composite",
                "-compose", "over", "-background", ecolor, "-flatten", outfile)
 
+    utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2, tmpA3, tmpB3, tmpC, tmpG, tmpC2)
 
-
-    #utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2, tmpA3, tmpB3)
 
 if __name__ == "__main__":
 
