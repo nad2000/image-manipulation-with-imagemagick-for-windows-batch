@@ -12,7 +12,7 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '0.07'
+VERSION = '0.09'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
@@ -84,6 +84,11 @@ setup(
     url = WEBSITE,
     license = 'WTFPL',
     console = [
+        {'script': 'gotham.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'kelvin.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'lomo.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'nashville.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'toaster.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage1.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage2.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage3.py', 'icon_resources': [(1, 'app.ico')],},
@@ -97,7 +102,8 @@ setup(
         {'script': 'remap.py', 'icon_resources': [(1, 'app.ico')],},
     ],
     options = {'py2exe': {'bundle_files': 1, 'compressed': True, "optimize": '2'}},
-    #zipfile=None
+    #zipfile=None,
+    data_files = [('.', ['Kelvin.jpg', 'Nashville.jpg'])],
 )
 
 

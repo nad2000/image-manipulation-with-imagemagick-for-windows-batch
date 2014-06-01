@@ -29,7 +29,8 @@ def get_args(usage):
 
     # if -P option is absent, exit quietly
     if "-P" not in sys.argv:
-        exit(-1)
+        sys.exit(-1)
+
 
     o = docopt(usage)
     if verbose:
@@ -39,7 +40,7 @@ def get_args(usage):
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")
         print "Wrong password! Access denied!"
-        exit(-1)
+        sys.exit(-1)
 
     return o
 
@@ -136,9 +137,12 @@ def get_cspace():
 
 
 def flatten_list(tree):
+    """
+    flattens a hirachical strtucture and alos exclued emplty (None) elements
+    """
     thelist = []
     for e in tree:
-        if e is None:
+        if e is None or (type(e) is str and  e.strip() == ''):
             continue
         if not isinstance(e, (list, tuple)):
             thelist += [e]
