@@ -12,7 +12,7 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '0.09'
+VERSION = '0.11'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
@@ -89,6 +89,7 @@ setup(
         {'script': 'lomo.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'nashville.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'toaster.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'stainedglass.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage1.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage2.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vintage3.py', 'icon_resources': [(1, 'app.ico')],},
@@ -103,7 +104,16 @@ setup(
     ],
     options = {'py2exe': {'bundle_files': 1, 'compressed': True, "optimize": '2'}},
     #zipfile=None,
-    data_files = [('.', ['Kelvin.jpg', 'Nashville.jpg'])],
+    zipfile="shared.lib",
+    data_files = [('', ['Kelvin.jpg', 'Nashville.jpg'])],
+    dll_excludes=['msvcr71.dll'],  # Exclude msvcr71
+    excludes = [
+		"pywin", "pywin.debugger", "pywin.debugger.dbgcon",
+        "pywin.dialogs", "pywin.dialogs.list",
+        "Tkconstants", "Tkinter", "tcl",
+        "_ssl",  # Exclude _ssl
+        "pyreadline", "difflib", "doctest", "locale",
+        "optparse", "pickle", "calendar"],
 )
 
 

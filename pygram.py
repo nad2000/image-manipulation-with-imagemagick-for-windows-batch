@@ -5,9 +5,8 @@ Created on Wed May 28 21:00:20 2014
 @author: nad2000
 """
 
-import subprocess
-import Image
 import os
+import sys
 import math
 import tempfile
 
@@ -19,23 +18,6 @@ class PyGram():
     def __init__(self, infile, outfile=None):
         self.filename = infile
         self.outfile = infile if outfile is None else outfile
-        self.im = False
-
-    def image(self):
-        if not self.im:
-            self.im = Image.open(self.filename)
-        return self.im
-
-    def execute(self, command, **kwargs):
-        default = dict(
-            filename=self.filename,
-            width=self.image().size[0],
-            height=self.image().size[1]
-        )
-        format = dict(default.items() + kwargs.items())
-        command = command.format(**format)
-        error = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
-        return error
 
 
     def colortone(self, color, level, type=0, infile=None, outfile=None):
@@ -78,7 +60,7 @@ class Frame(PyGram):
         if outfile is None:
             outfile = self.outfile
 
-        path = os.path.dirname(__file__)
+        path = os.path.dirname(sys.argv[0])
         ww, _ = utl.get_dim(infile)
         frame=os.path.join(path, frame)
         run_im(infile, '(', frame, "-resize", "{0}x{0}!".format(ww), "-unsharp", "1.5x1.0+1.5+0.02", ')', "-flatten", outfile)
