@@ -7,12 +7,16 @@ import tempfile
 from docopt import docopt
 from cStringIO import StringIO
 from math import sqrt
+import platform
 
 import conf
 
 if os.name == 'nt':
-    import distutils.spawn
-    IM_CMD = distutils.spawn.find_executable("convert")
+    IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), 'shared',
+        "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
+    if not os.path.exists(IM_CMD):
+        import distutils.spawn
+        IM_CMD = distutils.spawn.find_executable("convert")
 else:
     IM_CMD = 'convert'
 
@@ -36,6 +40,7 @@ def get_args(usage):
     if verbose:
         print "Options:"
         print o
+        print "*** ImageMagick: ", IM_CMD
 
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")
@@ -73,6 +78,8 @@ def color_num(file_name):
 
 
 def get_dim(file_name):
+
+    out = subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:'])
 
     return tuple(
         map(int, subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))

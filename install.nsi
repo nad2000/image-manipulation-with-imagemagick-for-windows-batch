@@ -44,7 +44,9 @@ ShowUnInstDetails show
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
-  File "dist\*.*"
+  File "dist\*.exe"
+  File /r "shared"
+  File /oname=shared\shared.lib "dist\shared\shared.lib"
 
   ; Stop previously installed service:
   ;;IfFileExists "$INSTDIR\${PRODUCT_SHORT_NAME}.exe" 0 +3
@@ -103,6 +105,10 @@ Section Uninstall
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\*.*"
 
+  RMDir /r /REBOOTOK "$INSTDIR\shared"
+  RMDir /r /REBOOTOK "$INSTDIR\dist"
+
+  
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk"
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\Website.lnk"
   Delete "$DESKTOP\${PRODUCT_NAME}.lnk"

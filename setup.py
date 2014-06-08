@@ -12,7 +12,7 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '0.11'
+VERSION = '0.16'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
@@ -104,8 +104,8 @@ setup(
     ],
     options = {'py2exe': {'bundle_files': 1, 'compressed': True, "optimize": '2'}},
     #zipfile=None,
-    zipfile="shared.lib",
-    data_files = [('', ['Kelvin.jpg', 'Nashville.jpg'])],
+    zipfile="shared\\shared.lib",
+    data_files = [('shared', ['Kelvin.jpg', 'Nashville.jpg'])],
     dll_excludes=['msvcr71.dll'],  # Exclude msvcr71
     excludes = [
 		"pywin", "pywin.debugger", "pywin.debugger.dbgcon",

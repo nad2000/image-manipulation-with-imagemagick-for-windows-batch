@@ -62,7 +62,7 @@ class Frame(PyGram):
 
         path = os.path.dirname(sys.argv[0])
         ww, _ = utl.get_dim(infile)
-        frame=os.path.join(path, frame)
+        frame=os.path.join(path, "shared", frame)
         run_im(infile, '(', frame, "-resize", "{0}x{0}!".format(ww), "-unsharp", "1.5x1.0+1.5+0.02", ')', "-flatten", outfile)
 
 
