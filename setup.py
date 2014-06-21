@@ -12,7 +12,7 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '0.16'
+VERSION = '1.01'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION

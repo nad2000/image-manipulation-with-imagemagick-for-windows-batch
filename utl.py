@@ -12,11 +12,13 @@ import platform
 import conf
 
 if os.name == 'nt':
-    IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), 'shared',
+    IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
         "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
     if not os.path.exists(IM_CMD):
-        import distutils.spawn
-        IM_CMD = distutils.spawn.find_executable("convert")
+        IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared", "convert.exe"))
+        if not os.path.exists(IM_CMD):
+            import distutils.spawn
+            IM_CMD = distutils.spawn.find_executable("convert")
 else:
     IM_CMD = 'convert'
 
@@ -51,7 +53,6 @@ def get_args(usage):
 
 #%%
 im_version = None
-
 
 def get_im_version():
     global im_version

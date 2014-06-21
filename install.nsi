@@ -1,6 +1,7 @@
 SetCompressor /SOLID lzma
 
 !include /NONFATAL config.nsh
+!include x64.nsh
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_SHORT_NAME}.exe"
@@ -45,8 +46,16 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
   File "dist\*.exe"
-  File /r "shared"
-  File /oname=shared\shared.lib "dist\shared\shared.lib"
+  SetOutPath "$INSTDIR\shared"
+  File "shared\*.jpg"
+  File "dist\shared\shared.lib"
+  ${If} ${RunningX64}
+    # 64 bit code
+	File /oname=convert.exe "shared\convert64.exe"
+  ${Else}
+    # 32 bit code
+	File /oname=convert.exe "shared\convert32.exe"
+  ${EndIf}      
 
   ; Stop previously installed service:
   ;;IfFileExists "$INSTDIR\${PRODUCT_SHORT_NAME}.exe" 0 +3
