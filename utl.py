@@ -6,21 +6,27 @@ import sys
 import tempfile
 from docopt import docopt
 from cStringIO import StringIO
+from functools import partial
 from math import sqrt
 import platform
 
 import conf
 
-if os.name == 'nt':
-    IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
-        "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
-    if not os.path.exists(IM_CMD):
-        IM_CMD = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared", "convert.exe"))
-        if not os.path.exists(IM_CMD):
-            import distutils.spawn
-            IM_CMD = distutils.spawn.find_executable("convert")
-else:
-    IM_CMD = 'convert'
+def find_im_command(cmd):
+    if os.name == 'nt':
+        ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
+            "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
+        if not os.path.exists(ret):
+            ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared", cmd + ".exe"))
+            if not os.path.exists(ret):
+                import distutils.spawn
+                ret = distutils.spawn.find_executable(cmd)
+        return ret
+    else:
+        return cmd
+
+IM_CMD = find_im_command('convert')
+COMPOSITE_CMD = find_im_command('coposite')
 
 verbose = False
 
@@ -181,6 +187,22 @@ def run_im(*args, **kwargs):
     return output
 
 
+def composite(*args, **kwargs):
+
+    global verbose
+
+    cmd = [COMPOSITE_CMD]
+    cmd += flatten_list(args)
+
+    if verbose:
+        print '#' * 80
+        print ' '.join(cmd)
+
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, **kwargs)
+
+    return proc
+
+
 def open_im(*args, **kwargs):
 
     global verbose
@@ -192,15 +214,47 @@ def open_im(*args, **kwargs):
         print '#' * 80
         print ' '.join(cmd)
 
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, **kwargs)
+    if 'stdout' in kwargs:
+        proc = subprocess.Popen(cmd, **kwargs)
+    else:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, **kwargs)
 
-    return proc.stdout
+    return proc
+
+ 
+def run_im(*args, **kwargs):
+    """
+    Run IamgeMagic composite command
+    """
+
+    global verbose
+
+    cmd = [IM_CMD]
+    cmd += flatten_list(args)
+
+    if verbose:
+        print '#' * 80
+        print ' '.join(cmd)
+
+    if 'stdout' in kwargs:
+        subprocess.check_call(cmd, **kwargs)
+        return None
+    else:
+        output = subprocess.check_output(cmd, **kwargs)
+        if output:
+            output = output.strip()
+
+        if verbose and output:
+            print '-' * 80
+            print output
+
+        return output
 
 
 def get_colors(file_name):
 
     with open_im(file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
-        '-define', 'histogram:unique-colors=true', 'histogram:info:-') as lines:
+        '-define', 'histogram:unique-colors=true', 'histogram:info:-').stdout as lines:
 
         return [map(
             int,
@@ -277,14 +331,14 @@ def make_pached(input_file, output_file, color_map_file):
     if version >= "06080310":
 
         with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
-                    "-compose", "copy_opacity", "-composite", "sparse-color:-") as out:
+                    "-compose", "copy_opacity", "-composite", "sparse-color:-").stdout as out:
             run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color",
                     "voronoi", "@-", output_file, stdin=out)
 
     elif version < "06060210" or  not process_test:
 
         with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
-                    "-compose", "copy_opacity", "-composite", "-monitor", "txt:-") as out:
+                    "-compose", "copy_opacity", "-composite", "-monitor", "txt:-").stdout as out:
 
 
             cmd = [IM_CMD, "-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
@@ -308,5 +362,5 @@ def make_pached(input_file, output_file, color_map_file):
     else:
         run_im(input_file, "(", "-background","black", color_map_file, ")", "-alpha", "off",
                 "-compose", "copy_opacity", "-composite", input_file)
-        with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:") as out:
+        with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:").stdout as out:
             run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi", "@-", output_file, stdin=out)

@@ -1,7 +1,7 @@
 set makensis="C:\Program Files (x86)\NSIS\makensis.exe"
 set python="C:\Python27\python.exe"
 set zip7="C:\Program Files\7-Zip\7z.exe"
-set upxEXE=C:\Tools\upx\upx.exe
+set upxEXE=%CD%\tools\upx391w\upx.exe
 
 rd /Q /S dist build
 

@@ -12,12 +12,12 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '1.01'
+VERSION = '1.02'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
 AUTHOR = 'Radomirs Cirskis'
-COPYRIGHT ="(c) 2014, Radomirs Cirskis",
+COPYRIGHT ="(c) 2014, 2015 Radomirs Cirskis",
 
 with open('config.nsh', 'w') as nsh:
     print >>nsh, """
@@ -96,6 +96,7 @@ setup(
         {'script': 'toycamera.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'crossprocess.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'sketch.py', 'icon_resources': [(1, 'app.ico')],},
+        {'script': 'shapemorph.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'thermography.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'nightvision.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'vignette.py', 'icon_resources': [(1, 'app.ico')],},
