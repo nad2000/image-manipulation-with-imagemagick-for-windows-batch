@@ -49,13 +49,17 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR\shared"
   File "shared\*.jpg"
   File "dist\shared\shared.lib"
-  ${If} ${RunningX64}
+  ;${If} ${RunningX64}
     # 64 bit code
-	File /oname=convert.exe "shared\convert64.exe"
-  ${Else}
-    # 32 bit code
-	File /oname=convert.exe "shared\convert32.exe"
-  ${EndIf}      
+;	File /oname=convert.exe "shared\convert64.exe"
+;  ${Else}
+;    # 32 bit code
+;	File /oname=convert.exe "shared\convert32.exe"
+;  ${EndIf}      
+
+  File "shared32\convert.exe"
+  File "shared32\composite.exe"
+  File "shared32\vcomp100.dll"
 
   ; Stop previously installed service:
   ;;IfFileExists "$INSTDIR\${PRODUCT_SHORT_NAME}.exe" 0 +3
