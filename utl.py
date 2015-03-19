@@ -12,7 +12,7 @@ import platform
 
 import conf
 
-def find_im_command(cmd):
+def find_command(cmd):
     if os.name == 'nt':
         ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
             "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
@@ -25,8 +25,10 @@ def find_im_command(cmd):
     else:
         return cmd
 
-IM_CMD = find_im_command('convert')
-COMPOSITE_CMD = find_im_command('coposite')
+IM_CMD = find_command('convert')
+COMPOSITE_CMD = find_command('coposite')
+FFMPEG_CMD = find_command('ffmpeg')
+AVCONV_CMD = find_command('avconv')
 
 verbose = False
 
@@ -221,10 +223,10 @@ def open_im(*args, **kwargs):
 
     return proc
 
- 
+
 def run_im(*args, **kwargs):
     """
-    Run IamgeMagic composite command
+    Run IamgeMagic convert command
     """
 
     global verbose
@@ -241,6 +243,66 @@ def run_im(*args, **kwargs):
         return None
     else:
         output = subprocess.check_output(cmd, **kwargs)
+        #output = subprocess.check_call(cmd, **kwargs)
+        if output:
+            output = output.strip()
+
+        if verbose and output:
+            print '-' * 80
+            print output
+
+        return output
+
+def ffmpeg(*args, **kwargs):
+    """
+    Run FFMPEG command
+    """
+
+    global verbose
+
+    cmd = [FFMPEG_CMD]
+    cmd += flatten_list(args)
+
+    if verbose:
+        print '#' * 80
+        print ' '.join(cmd)
+
+    if 'stdout' in kwargs:
+        subprocess.check_call(cmd, **kwargs)
+        return None
+    else:
+        output = subprocess.check_output(cmd, **kwargs)
+        #output = subprocess.check_call(cmd, **kwargs)
+        if output:
+            output = output.strip()
+
+        if verbose and output:
+            print '-' * 80
+            print output
+
+        return output
+
+
+def avconv(*args, **kwargs):
+    """
+    Run AVCONV command
+    """
+
+    global verbose
+
+    cmd = [AVCONV_CMD]
+    cmd += flatten_list(args)
+
+    if verbose:
+        print '#' * 80
+        print ' '.join(cmd)
+
+    if 'stdout' in kwargs:
+        subprocess.check_call(cmd, **kwargs)
+        return None
+    else:
+        output = subprocess.check_output(cmd, **kwargs)
+        #output = subprocess.check_call(cmd, **kwargs)
         if output:
             output = output.strip()
 

@@ -8,41 +8,44 @@ Created on Mon May  7 22:13:46 2015
 
 import tempfile
 import utl
+import os
 from subprocess import PIPE
 
 USAGE = """
 USAGE:
-    shapemorph -P PASSWORD [-f FRAMES] [-d DELAY] [-p PAUSE] [-r] [-m] CONTROLPOINTS INFILE1 INFILE2 OUTFILE
+    shapemorph -P PASSWORD [-f FRAMES] [-d DELAY] [-p PAUSE] [-r] [-m] [-F] CONTROLPOINTS INFILE1 INFILE2 OUTFILE
     shapemorph (-h | --help)
- 
+
 OPTIONS:
- -h --help         Show this screen.
- -P PASSWORD       Password
- -f FRAMES         Number of frames in animation; frames>1; [default: 20]
- -d DELAY          Delay between frames; delay>0; [default: 10]
- -p PAUSE          Pause delay for two undistorted input images;
-                   pause>0; [default: 100]
- -r                Reverse the animation sequence and append it to the end
- -m                Enable progress monitoring of the generation of each frame
- CONTROLPOINTS     Control point location in INFILE1 and INFILE2, respectively;
-                   MUST be specified just prior to INFILE1 and OUTFILE1
-                   consist of four, comma or space seperated numbers, eg, "x1,y1 x2,y2"
+ -h --help      Show this screen.
+ -P PASSWORD    Password
+ -f FRAMES      Number of frames in animation; frames>1; [default: 20]
+ -d DELAY       Delay between frames; delay>0; [default: 10]
+ -p PAUSE       Pause delay for two undistorted input images;
+                pause>0; [default: 100]
+ -r             Reverse the animation sequence and append it to the end
+ -m             Enable progress monitoring of the generation of each frame
+ -F             Generate series of frames
+ CONTROLPOINTS  Control point location in INFILE1 and INFILE2, respectively;
+                MUST be specified just prior to INFILE1 and OUTFILE1
+                consist of four, comma or space seperated numbers, eg, "x1,y1 x2,y2"
 
  """
 ## -F             generate sequence of file instead of animated gif file
- 
-def process(infile1, infile2, outfile, frames='20', delay='10', pause='100', reverse=False,
-        monitor=False, multiple_files=False, coords=None):
+
+def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', reverse=False,
+        monitor=False, coords=None, separate=False):
 
     try:
-        if int(frames) <= 1:
+        frames = int(frames)
+        if frames <= 1:
             raise Exception("Frames=\"{0}\" must be an integer greater than 1".formant(frames))
-        if int(delay) < 1:
+        if delay < 1:
             raise Exception("Delay=\"{0}\" must be a positive integer".formant(delay))
-        if int(pause) < 0:
+        if pause < 0:
             raise Exception("Pause=\"{0}\" must be a non-negative integer".formant(pause))
     except ValueError as e:
-        raise Exception("Incorrect value: frames='{0}', delay='{1}', pause='{2}'".format(frames, delay, pause))        
+        raise Exception("Incorrect value: frames='{0}', delay='{1}', pause='{2}'".format(frames, delay, pause))
 
     # test that coordinates are specified correctly
     if coords == "":
@@ -53,12 +56,14 @@ def process(infile1, infile2, outfile, frames='20', delay='10', pause='100', rev
     except:
         raise Exception("Incorrect control points: {0}".format(coords))
 
+    output_name, output_ext = os.path.splitext(outfile)
+
     # create the in between frames
-    frames_between = (int(frames) - 1)
+    frames_between = (frames - 1)
 
     tmpA = tempfile.mktemp(suffix='.mpc')
     tmpB = tempfile.mktemp(suffix='.mpc')
-    
+
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile1, '+repage', tmpA)
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile2, '+repage', tmpB)
 
@@ -77,10 +82,10 @@ def process(infile1, infile2, outfile, frames='20', delay='10', pause='100', rev
     # use -distort shepards technique
     # set corner control points as fixed
     corners = "0,0 0,0  {0},0 {0},0  {0},{1} {0},{1}  0,{1} 0,{1}".format(wm1, hm1)
-    
+
     # do geometric warping and intensity blending
     print "Processing {0} Frames:".format(frames)
-    
+
     # initial coord for destination for both images
     cpx, cpy = xx1, yy1
 
@@ -88,18 +93,22 @@ def process(infile1, infile2, outfile, frames='20', delay='10', pause='100', rev
     dx = round(float(xx2 - xx1) / frames_between, 4)
     dy = round(float(yy2 - yy1) / frames_between, 4)
 
-   
-    # reverse and append if desired
-    if reverse:
-        final_im = utl.open_im("-", "(", "-clone", "-2-1", ")", "-loop", '0', outfile, stdin=PIPE)
-    else:
-        final_im = utl.open_im("-", "-loop", '0', outfile, stdin=PIPE)
 
-    # add infile1 as first (zeroth) frame
     print "0 (start image)"
-    utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
+    if separate:
+        utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
+    else:
+        # reverse and append if desired
+        if reverse:
+            final_im = utl.open_im("-", "(", "-clone", "-2-1", ")", "-loop", '0', output_name + ".gif", stdin=PIPE)
+        else:
+            final_im = utl.open_im("-", "-loop", '0', output_name + ".gif", stdin=PIPE)
 
-    for i in range(1, int(frames)):
+        # add infile1 as first (zeroth) frame
+        utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
+
+
+    for i in range(1, frames):
         print i
         blend = round((100. * i) / frames_between, 4)
         # new same location for a given iteration used for both images
@@ -111,36 +120,50 @@ def process(infile1, infile2, outfile, frames='20', delay='10', pause='100', rev
         # interate new control point for infile 1 (A)
         cpointsa = corners + "  {0},{1} {2},{3}".format(xx1, yy1, cpx, cpy)
 
-        im = utl.open_im("-", "-reverse", "-define", "compose:args={0}%".format(blend),
-                         "-compose", "blend", "-composite", "miff:-",
-                         stdout=final_im.stdin, stdin=PIPE)
+        if separate:
+            frame_file_name = output_name + "{:05}.png".format(i)
+            im = utl.open_im("-", "-reverse", "-define", "compose:args={0}%".format(blend),
+                             "-compose", "blend", "-composite", frame_file_name, stdin=PIPE)
+        else:
+            im = utl.open_im("-", "-reverse", "-define", "compose:args={0}%".format(blend),
+                             "-compose", "blend", "-composite", "miff:-",
+                             stdout=final_im.stdin, stdin=PIPE)
 
         # NOTE: A multi-image miff is just a concatanation of images!
         # transform B to A
         utl.run_im(tmpB, "-distort", "shepards", cpointsb, "miff:-", stdout=im.stdin)
         # transform A to B
         utl.run_im(tmpA, "-distort", "shepards", cpointsa, "miff:-", stdout=im.stdin)
-
         im.stdin.close()
         im.wait()
 
+
     else:
         # add infile2 as last frame
-        print i, "(end image)"
-        
+        print frames, "(end image)"
 
-    utl.run_im("-delay", pause, tmpB,  "miff:-", stdout=final_im.stdin)
+    if separate:
+        utl.run_im("-delay", pause, tmpB,  output_name + "{:05}.png".format(frames))
 
-    final_im.stdin.close()
-    final_im.wait()
+    else:
+        utl.run_im("-delay", pause, tmpB,  "miff:-", stdout=final_im.stdin)
+
+        final_im.stdin.close()
+        final_im.wait()
+
+        if output_ext in ['.mp4', '.avi']:
+            utl.run_im(output_name + ".gif", output_name + "%05d.png")
+
+    if output_ext in ['.mp4', '.avi']:
+        utl.avconv("-r", "24", "-i", output_name + "%05d.png", "-an", outfile)
 
     utl.delete_tmp_files(tmpA, tmpB)
 
 
 if __name__ == "__main__":
     o = utl.get_args(USAGE)
-    
+
     process(
         frames=o.get('-f'), delay=o.get('-d'), pause=o.get('-p'), reverse=o.get('-r'),
-        monitor=o.get('-m'), multiple_files=o.get('-F'), coords=o.get('CONTROLPOINTS'),
+        monitor=o.get('-m'), separate=o.get('-F'), coords=o.get('CONTROLPOINTS'),
         infile1=o.get('INFILE1'), infile2=o.get('INFILE2'), outfile=o.get('OUTFILE'))
