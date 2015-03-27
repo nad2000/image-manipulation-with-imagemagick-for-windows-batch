@@ -15,7 +15,7 @@ import conf
 def find_command(cmd):
     if os.name == 'nt':
         ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
-            "convert" + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
+            cmd + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
         if not os.path.exists(ret):
             ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared", cmd + ".exe"))
             if not os.path.exists(ret):
