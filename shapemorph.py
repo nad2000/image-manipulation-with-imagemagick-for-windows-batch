@@ -13,7 +13,7 @@ from subprocess import PIPE
 
 USAGE = """
 USAGE:
-    shapemorph -P PASSWORD [-f FRAMES] [-d DELAY] [-p PAUSE] [-r] [-m] [-F] CONTROLPOINTS INFILE1 INFILE2 OUTFILE
+    shapemorph -P PASSWORD [-f FRAMES] [-d DELAY] [-p PAUSE] [-r] [-m] [-F] [-w WATERMARK] CONTROLPOINTS INFILE1 INFILE2 OUTFILE
     shapemorph (-h | --help)
 
 OPTIONS:
@@ -26,6 +26,7 @@ OPTIONS:
  -r             Reverse the animation sequence and append it to the end
  -m             Enable progress monitoring of the generation of each frame
  -F             Generate series of frames
+ -w WATERMARK   Overlay with watermark (PNG file with transparency)
  CONTROLPOINTS  Control point location in INFILE1 and INFILE2, respectively;
                 MUST be specified just prior to INFILE1 and OUTFILE1
                 consist of four, comma or space seperated numbers, eg, "x1,y1 x2,y2"
@@ -34,7 +35,7 @@ OPTIONS:
 ## -F             generate sequence of file instead of animated gif file
 
 def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', reverse=False,
-        monitor=False, coords=None, separate=False):
+        watermark=None, monitor=False, coords=None, separate=False):
 
     try:
         frames = int(frames)
@@ -66,6 +67,10 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
 
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile1, '+repage', tmpA)
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile2, '+repage', tmpB)
+    
+    if watermark is not None:
+        watermark_c = tempfile.mktemp(suffix='.mpc')
+        utl.run_im('-quiet', '-regard-warnings', '-delay', delay, watermark, '+repage', watermark_c)
 
     aw, ah = utl.get_dim(tmpA)
     bw, bh = utl.get_dim(tmpB)
@@ -96,7 +101,11 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
 
     print "0 (start image)"
     if separate:
-        utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
+        if watermark is None:
+            utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
+        else:
+            utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", output_name + "00000.png")
+            
     else:
         # reverse and append if desired
         if reverse:
@@ -105,7 +114,11 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
             final_im = utl.open_im("-", "-loop", '0', output_name + ".gif", stdin=PIPE)
 
         # add infile1 as first (zeroth) frame
-        utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
+        if watermark is None:
+            utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
+        else:
+            utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", "miff:-", stdout=final_im.stdin)
+            
 
 
     for i in range(1, frames):
@@ -120,14 +133,16 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         # interate new control point for infile 1 (A)
         cpointsa = corners + "  {0},{1} {2},{3}".format(xx1, yy1, cpx, cpy)
 
+        blending_options = ['(', "-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite", ')']
+        if watermark is not None:
+            blending_options += [watermark_c, "-composite"]
+
         if separate:
-            frame_file_name = output_name + "{:05}.png".format(i)
-            im = utl.open_im("-", "-reverse", "-define", "compose:args={0}%".format(blend),
-                             "-compose", "blend", "-composite", frame_file_name, stdin=PIPE)
+            blending_options.append(output_name + "{:05}.png".format(i))
+            im = utl.open_im(*blending_options, stdin=PIPE)
         else:
-            im = utl.open_im("-", "-reverse", "-define", "compose:args={0}%".format(blend),
-                             "-compose", "blend", "-composite", "miff:-",
-                             stdout=final_im.stdin, stdin=PIPE)
+            blending_options.append("miff:-")
+            im = utl.open_im(*blending_options, stdout=final_im.stdin, stdin=PIPE)
 
         # NOTE: A multi-image miff is just a concatanation of images!
         # transform B to A
@@ -143,10 +158,16 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         print frames, "(end image)"
 
     if separate:
-        utl.run_im("-delay", pause, tmpB,  output_name + "{:05}.png".format(frames))
+        if watermark is None:
+            utl.run_im("-delay", pause, tmpB, output_name + "{:05}.png".format(frames))
+        else:
+            utl.run_im("-delay", pause, tmpB, watermark_c, "-composite", output_name + "{:05}.png".format(frames))
 
     else:
-        utl.run_im("-delay", pause, tmpB,  "miff:-", stdout=final_im.stdin)
+        if watermark is None:
+            utl.run_im("-delay", pause, tmpB, "miff:-", stdout=final_im.stdin)
+        else:
+            utl.run_im("-delay", pause, tmpB, watermark_c, "-composite", "miff:-", stdout=final_im.stdin)
 
         final_im.stdin.close()
         final_im.wait()
@@ -158,6 +179,8 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         utl.avconv("-r", "24", "-i", output_name + "%05d.png", "-an", outfile)
 
     utl.delete_tmp_files(tmpA, tmpB)
+    if watermark is not None:
+        utl.delete_tmp_files(watermark_c)
 
 
 if __name__ == "__main__":
@@ -166,4 +189,5 @@ if __name__ == "__main__":
     process(
         frames=o.get('-f'), delay=o.get('-d'), pause=o.get('-p'), reverse=o.get('-r'),
         monitor=o.get('-m'), separate=o.get('-F'), coords=o.get('CONTROLPOINTS'),
-        infile1=o.get('INFILE1'), infile2=o.get('INFILE2'), outfile=o.get('OUTFILE'))
+        infile1=o.get('INFILE1'), infile2=o.get('INFILE2'), outfile=o.get('OUTFILE'),
+        watermark=o.get('-w'))
