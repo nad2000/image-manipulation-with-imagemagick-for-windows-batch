@@ -104,7 +104,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         if watermark is None:
             utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
         else:
-            utl.run_im('-delay', pause, tmpA, watermark_c, "-compose", "Overlay", "-composite", output_name + "00000.png")
+            utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", output_name + "00000.png")
             
     else:
         # reverse and append if desired
@@ -117,7 +117,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         if watermark is None:
             utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
         else:
-            utl.run_im('-delay', pause, tmpA, watermark_c, "-compose", "Overlay", "-composite", "miff:-", stdout=final_im.stdin)
+            utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", "miff:-", stdout=final_im.stdin)
             
 
 
@@ -133,9 +133,9 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         # interate new control point for infile 1 (A)
         cpointsa = corners + "  {0},{1} {2},{3}".format(xx1, yy1, cpx, cpy)
 
-        blending_options = ["-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite"]
+        blending_options = ['(', "-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite", ')']
         if watermark is not None:
-            blending_options += [watermark_c, "-compose", "Overlay", "-composite"]
+            blending_options += [watermark_c, "-composite"]
 
         if separate:
             blending_options.append(output_name + "{:05}.png".format(i))
@@ -161,13 +161,13 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         if watermark is None:
             utl.run_im("-delay", pause, tmpB, output_name + "{:05}.png".format(frames))
         else:
-            utl.run_im("-delay", pause, tmpB, watermark_c, "-compose", "Overlay", "-composite", output_name + "{:05}.png".format(frames))
+            utl.run_im("-delay", pause, tmpB, watermark_c, "-composite", output_name + "{:05}.png".format(frames))
 
     else:
         if watermark is None:
             utl.run_im("-delay", pause, tmpB, "miff:-", stdout=final_im.stdin)
         else:
-            utl.run_im("-delay", pause, tmpB, watermark_c, "-compose", "Overlay", "-composite", "miff:-", stdout=final_im.stdin)
+            utl.run_im("-delay", pause, tmpB, watermark_c, "-composite", "miff:-", stdout=final_im.stdin)
 
         final_im.stdin.close()
         final_im.wait()
