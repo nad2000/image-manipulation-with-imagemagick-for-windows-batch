@@ -133,7 +133,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         # interate new control point for infile 1 (A)
         cpointsa = corners + "  {0},{1} {2},{3}".format(xx1, yy1, cpx, cpy)
 
-        blending_options = ['(', "-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite", ')']
+        blending_options = ["-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite"]
         if watermark is not None:
             blending_options += [watermark_c, "-composite"]
 
