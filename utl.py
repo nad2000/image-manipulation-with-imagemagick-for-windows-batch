@@ -21,8 +21,8 @@ def find_command(cmd):
             if not os.path.exists(ret):
                 import distutils.spawn
                 ret = distutils.spawn.find_executable(cmd)
-				if ret is None and cmd == 'avconv':
-					ret = find_command('ffmpeg')
+                if ret is None and cmd == 'avconv':
+                    ret = find_command('ffmpeg')
         return ret
     else:
         return cmd

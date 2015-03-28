@@ -59,6 +59,7 @@ Section "MainSection" SEC01
 
   File "shared32\convert.exe"
   File "shared32\composite.exe"
+  File "shared32\ffmpeg.exe"
   File "shared32\vcomp100.dll"
 
   ; Stop previously installed service:
