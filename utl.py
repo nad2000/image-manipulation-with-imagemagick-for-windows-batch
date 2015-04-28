@@ -67,7 +67,7 @@ im_version = None
 def get_im_version():
     global im_version
     if im_version is None:
-        version = subprocess.check_output([IM_CMD, '-list', 'configure'])
+        version = run_im('-list', 'configure')
         version = version[version.find('LIB_VERSION_NUMBER'):]
         version = version[:version.find('\n')]
         version = version.split()[1]
@@ -78,31 +78,31 @@ def get_im_version():
 
 def get_file_colorspace(file_name):
 
-    return subprocess.check_output([IM_CMD, file_name, '-ping', '-format', '%[colorspace]', 'info:']).strip()
+    return run_im(file_name, '-ping', '-format', '%[colorspace]', 'info:')
 
 #%%
 
 
 def color_num(file_name):
 
-    return int(subprocess.check_output([IM_CMD, file_name, '-format', '"%k"', 'info:']).strip('"\' \t\n\r'))
+    return int(run_im(file_name, '-format', '"%k"', 'info:').strip('"\' \t\n\r'))
 
 
 def get_dim(file_name):
 
-    out = subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:'])
+    out = run_im(file_name, '-format', '"%wx%h"', 'info:')
 
     return tuple(
-        map(int, subprocess.check_output([IM_CMD, file_name, '-format', '"%wx%h"', 'info:']).strip('"\' \t\n\r').split('x')))
+        map(int, run_im(file_name, '-format', '"%wx%h"', 'info:').strip('"\' \t\n\r').split('x')))
 
 
 def hsl_to_cspace(tinthue, tintsaturation, tintlightness, cspace):
 
     tinthue, tintsaturation, tintlightness = map(lambda s: str(s) if type(s) is str else s, [tinthue, tintsaturation, tintlightness])
-    cmd = [IM_CMD, "-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
+    args = ["-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
            "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:"]
-    print ' '.join(cmd)
-    return (subprocess.check_output(cmd)).strip()
+    #print ' '.join(cmd)
+    return run_im(*cmd)
 
 
 def hsl_to_srgb(tinthue, tintsaturation, tintlightness):
@@ -180,7 +180,16 @@ def run_im(*args, **kwargs):
         print '#' * 80
         print ' '.join(cmd)
 
-    output = subprocess.check_output(cmd, **kwargs)
+    #output = subprocess.check_output(cmd, **kwargs)
+    process = subprocess.Popen(stdout=subprocess.PIPE, *cmd, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    #if retcode:
+    #    cmd = kwargs.get("args")
+    #    if cmd is None:
+    #        cmd = popenargs[0]
+    #    raise CalledProcessError(retcode, cmd, output=output)
+    #return output    
     if output:
         output = output.strip()
 
@@ -225,36 +234,7 @@ def open_im(*args, **kwargs):
 
     return proc
 
-
-def run_im(*args, **kwargs):
-    """
-    Run IamgeMagic convert command
-    """
-
-    global verbose
-
-    cmd = [IM_CMD]
-    cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
-
-    if 'stdout' in kwargs:
-        subprocess.check_call(cmd, **kwargs)
-        return None
-    else:
-        output = subprocess.check_output(cmd, **kwargs)
-        #output = subprocess.check_call(cmd, **kwargs)
-        if output:
-            output = output.strip()
-
-        if verbose and output:
-            print '-' * 80
-            print output
-
-        return output
-
+    
 def ffmpeg(*args, **kwargs):
     """
     Run FFMPEG command

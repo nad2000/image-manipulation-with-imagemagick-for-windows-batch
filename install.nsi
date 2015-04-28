@@ -47,6 +47,7 @@ Section "MainSection" SEC01
   SetOverwrite try
   File "dist\*.exe"
   SetOutPath "$INSTDIR\shared"
+  File "shared\configure.xml"
   File "shared\*.jpg"
   File "dist\shared\shared.lib"
   ;${If} ${RunningX64}
