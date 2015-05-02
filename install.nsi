@@ -47,7 +47,6 @@ Section "MainSection" SEC01
   SetOverwrite try
   File "dist\*.exe"
   SetOutPath "$INSTDIR\shared"
-  File "shared\configure.xml"
   File "shared\*.jpg"
   File "dist\shared\shared.lib"
   ;${If} ${RunningX64}
@@ -58,10 +57,8 @@ Section "MainSection" SEC01
 ;	File /oname=convert.exe "shared\convert32.exe"
 ;  ${EndIf}      
 
-  File "shared32\convert.exe"
-  File "shared32\composite.exe"
-  File "shared32\ffmpeg.exe"
-  File "shared32\vcomp100.dll"
+  SetOutPath "$INSTDIR\shared32"
+  File "shared32\*.*"
 
   ; Stop previously installed service:
   ;;IfFileExists "$INSTDIR\${PRODUCT_SHORT_NAME}.exe" 0 +3
