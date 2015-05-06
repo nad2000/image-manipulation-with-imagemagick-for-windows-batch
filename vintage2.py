@@ -125,12 +125,12 @@ def process(
                 "-evaluate", "set", backgroundmix + '%', "+channel", ')',
             "-compose", "overlay", "-composite", tmpA1)
 
-    # setup vignette
-    utl.setup_vignette(tmpA2, vignetteshape, vignettesize, vignetterounding)
-
-    # add vignette
-    if vignetteshape != "none":
-        utl.add_vignette(tmpA1, tmpA2, vignettelighten)
+        # setup vignette
+        utl.setup_vignette(tmpA2, vignetteshape, vignettesize, vignetterounding)
+    
+        # add vignette
+        if vignetteshape != "none":
+            utl.add_vignette(tmpA1, tmpA2, vignettelighten)
 
     # add border/frame
     if bordertype == "torn":

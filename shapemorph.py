@@ -118,7 +118,6 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
             utl.run_im('-delay', pause, tmpA, "miff:-", stdout=final_im.stdin)
         else:
             utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", "miff:-", stdout=final_im.stdin)
-            
 
 
     for i in range(1, frames):
@@ -134,12 +133,13 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         cpointsa = corners + "  {0},{1} {2},{3}".format(xx1, yy1, cpx, cpy)
 
         blending_options = ["-", "-reverse", "-define", "compose:args={0}%".format(blend), "-compose", "blend", "-composite"]
-        #if watermark is not None:
-        #    blending_options += [watermark_c, "-composite"]
 
         if separate:
-            blending_options.append(output_name + "{:05}.png".format(i))
-            im = utl.open_im(*blending_options, stdin=PIPE)
+            if watermark:
+                wm_im = utl.open_im("-", watermark_c, "-composite", output_name + "{:05}.png".format(i), stdin=PIPE)
+                im = utl.open_im(*blending_options, stdout=wm_im.stdin, stdin=PIPE)
+            else:
+                im = utl.open_im(*blending_options, stdin=PIPE)
         else:
             blending_options.append("miff:-")
             if watermark:
