@@ -9,6 +9,7 @@ Created on Mon May  7 22:13:46 2015
 import tempfile
 import utl
 import os
+import sys
 from subprocess import PIPE
 
 USAGE = """
@@ -25,14 +26,12 @@ OPTIONS:
                 pause>0; [default: 100]
  -r             Reverse the animation sequence and append it to the end
  -m             Enable progress monitoring of the generation of each frame
- -F             Generate series of frames
  -w WATERMARK   Overlay with watermark (PNG file with transparency)
  CONTROLPOINTS  Control point location in INFILE1 and INFILE2, respectively;
                 MUST be specified just prior to INFILE1 and OUTFILE1
                 consist of four, comma or space seperated numbers, eg, "x1,y1 x2,y2"
 
  """
-## -F             generate sequence of file instead of animated gif file
 
 def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', reverse=False,
         watermark=None, monitor=False, coords=None, separate=False):
@@ -47,7 +46,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
             raise Exception("Pause=\"{0}\" must be a non-negative integer".formant(pause))
     except ValueError as e:
         raise Exception("Incorrect value: frames='{0}', delay='{1}', pause='{2}'".format(frames, delay, pause))
-
+        
     # test that coordinates are specified correctly
     if coords == "":
       raise Exception("--- NO CONTROL POINTS WERE SPECIFIED ---")
@@ -58,6 +57,10 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         raise Exception("Incorrect control points: {0}".format(coords))
 
     output_name, output_ext = os.path.splitext(outfile)
+    
+    if output_ext not in [".gif", ".giff"]:
+        print "Wrong output file type.\nExpected .gif output file instead of {0}: {1}".format(output_ext, outfile)
+        sys.exit(45)
 
     # create the in between frames
     frames_between = (frames - 1)
