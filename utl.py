@@ -12,6 +12,15 @@ import platform
 
 import conf
 
+
+def log(line):
+    global verbose
+
+    if verbose:
+        print '#' * 80
+        print ' '.join([os.path.basename(line[0]).replace(".exe",'')] + line[1:])
+
+
 def find_command(cmd):
     if os.name == 'nt':
         ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
@@ -174,14 +183,9 @@ def flatten_list(tree):
 
 def composite(*args, **kwargs):
 
-    global verbose
-
     cmd = [COMPOSITE_CMD]
     cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
+    log(cmd)
 
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, **kwargs)
 
@@ -190,14 +194,9 @@ def composite(*args, **kwargs):
 
 def open_im(*args, **kwargs):
 
-    global verbose
-
     cmd = [IM_CMD]
     cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
+    log(cmd)
 
     if 'stdout' in kwargs:
         proc = subprocess.Popen(cmd, **kwargs)
@@ -216,10 +215,7 @@ def run_im(*args, **kwargs):
 
     cmd = [IM_CMD]
     cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
+    log(cmd)
 
     if 'stdout' in kwargs:
         subprocess.check_call(cmd, **kwargs)
@@ -249,10 +245,7 @@ def ffmpeg(*args, **kwargs):
 
     cmd = [FFMPEG_CMD]
     cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
+    log(cmd)
 
     if 'stdout' in kwargs:
         subprocess.check_call(cmd, **kwargs)
@@ -279,10 +272,7 @@ def avconv(*args, **kwargs):
 
     cmd = [AVCONV_CMD]
     cmd += flatten_list(args)
-
-    if verbose:
-        print '#' * 80
-        print ' '.join(cmd)
+    log(cmd)
 
     if 'stdout' in kwargs:
         subprocess.check_call(cmd, **kwargs)
@@ -392,9 +382,7 @@ def make_pached(input_file, output_file, color_map_file):
 
             cmd = [IM_CMD, "-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
                    "@-", "+monitor", output_file]
-            if verbose:
-                print '#'*80
-                print ' '.join(cmd)
+            log(cmd)
 
             p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
             print "\nProgress:\n"

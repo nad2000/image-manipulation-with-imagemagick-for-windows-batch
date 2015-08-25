@@ -65,7 +65,7 @@ def process(
     setcspace = utl.get_cspace_option()
     version = utl.get_im_version()
 
-    cspace1 = "sRGB" if version == "06070606" else "RGB"
+    cspace1 = "sRGB" if version >= "06070606" else "RGB"
     cspace2 = cspace1 + 'A'
 
     colorspace = utl.get_file_colorspace(infile)
@@ -115,7 +115,7 @@ def process(
 
     with open(tmpC, 'w') as cf, open(tmpG, 'w') as gf:
 
-        print >>cf, "# ImageMagick pixel enumeration: {},{},255,rgb\n".format(ww, hh)
+        print >>cf, "# ImageMagick pixel enumeration: {},{},255,rgb".format(ww, hh)
 
         if kind in ["random", "r"]:
             y = k = 0
@@ -141,7 +141,7 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)".format(xx, yy)
+                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy)
                     print >>gf, "{} {} gray({}%)".format(xx, yy, g)
                     x += size
                     k += 1
