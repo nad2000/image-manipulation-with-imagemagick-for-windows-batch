@@ -65,8 +65,12 @@ def process(
     setcspace = utl.get_cspace_option()
     version = utl.get_im_version()
 
-    cspace1 = "sRGB" if version >= "06070606" else "RGB"
-    cspace2 = cspace1 + 'A'
+    if version > "06080504":
+        cspace2 = cspace1 = ""
+    else:
+        cspace1 = "sRGB" if version >= "06070606" else "RGB"
+        cspace2 = cspace1 + 'A'
+
 
     colorspace = utl.get_file_colorspace(infile)
 
@@ -139,10 +143,10 @@ def process(
                     if yy < 0: yy = 0
                     if yy > hh1: yy = hh1
 
-                    g = round(100.0 * k / qrange, 8)
+                    g = k % qrange
 
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy)
-                    print >>gf, "{} {} gray({}%)".format(xx, yy, g)
+                    print >>gf, "{} {} gray({})".format(xx, yy, g)
                     x += size
                     k += 1
 
@@ -160,10 +164,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = round(100.0 * k / qrange, 8)
+                    g = k % qrange
 
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({}%)".format(x, y, g)
+                    print >>gf, "{} {} gray({})".format(x, y, g)
                     x += size
                     k += 1
 
@@ -183,10 +187,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = round(100.0 * k / qrange, 8)
+                    g = k % qrange
 
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({}%)".format(x, y, g)
+                    print >>gf, "{} {} gray({})".format(x, y, g)
                     x += size
                     k += 1
 
