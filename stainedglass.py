@@ -48,7 +48,7 @@ size and border around the cell can be specified.
 
 
 def process(
-        infile, outfile, backgroundfile, kind, size, offset, ncolors, bright, ecolor, thick, rseed, average):
+        infile, outfile, kind, size, offset, ncolors, bright, ecolor, thick, rseed, average):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
@@ -162,7 +162,7 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)".format(x, y)
+                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
                     print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
@@ -185,7 +185,7 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)".format(x, y)
+                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
                     print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
@@ -215,4 +215,4 @@ if __name__ == "__main__":
     process(
         kind=o.get('-k'), size=o.get('-s'), offset=o.get('-o'), ncolors=o.get('-n'), bright=o.get('-b'),
         ecolor=o.get('-e'), thick=o.get('-t'), rseed=o.get('-r'), average=o.get('-a'),
-        infile=o.get('INFILE'), outfile=o.get('OUTFILE'), backgroundfile=o.get('BACKGROUNDFILE'))
+        infile=o.get('INFILE'), outfile=o.get('OUTFILE'))
