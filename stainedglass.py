@@ -143,10 +143,10 @@ def process(
                     if yy < 0: yy = 0
                     if yy > hh1: yy = hh1
 
-                    g = k % qrange
-
+                    g = round(100.0 * k / qrange, 8)
+                    
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy)
-                    print >>gf, "{} {} gray({})".format(xx, yy, g)
+                    print >>gf, "{} {} gray({}%)".format(xx, yy, g)
                     x += size
                     k += 1
 
@@ -164,10 +164,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = k % qrange
+                    g = round(100.0 * k / qrange, 8)
 
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({})".format(x, y, g)
+                    print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
 
@@ -187,10 +187,10 @@ def process(
                     if x > ww1: x = ww1
                     if y > hh1: y = hh1
 
-                    g = k % qrange
+                    g = round(100.0 * k / qrange, 8)
 
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({})".format(x, y, g)
+                    print >>gf, "{} {} gray({}%)".format(x, y, g)
                     x += size
                     k += 1
 
@@ -209,7 +209,7 @@ def process(
         run_im(tmpA2, tmpA3, "-alpha", "off", "-compose", "copy_opacity", "-composite",
                "-compose", "over", "-background", ecolor, "-flatten", outfile)
 
-    utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2, tmpA3, tmpB3, tmpC, tmpG, tmpC2)
+    #utl.delete_tmp_files(tmpA1, tmpB1, tmpA2, tmpB2, tmpA3, tmpB3, tmpC, tmpG, tmpC2)
 
 
 if __name__ == "__main__":
