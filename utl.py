@@ -218,7 +218,9 @@ def run_im(*args, **kwargs):
     log(cmd)
 
     if 'stdout' in kwargs:
-        subprocess.check_call(cmd, **kwargs)
+        retcode = subprocess.call(cmd, **kwargs)
+        if retcode != 0 and verbose:
+            print "Last command %s RC=%s" % (cmd, retcode)
         return None
     else:
         try:
