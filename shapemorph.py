@@ -8,6 +8,7 @@ Created on Mon May  7 22:13:46 2015
 
 import tempfile
 import utl
+from utl import show_timing
 import os
 import sys
 from subprocess import PIPE
@@ -46,7 +47,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
             raise Exception("Pause=\"{0}\" must be a non-negative integer".formant(pause))
     except ValueError as e:
         raise Exception("Incorrect value: frames='{0}', delay='{1}', pause='{2}'".format(frames, delay, pause))
-        
+
     # test that coordinates are specified correctly
     if coords == "":
       raise Exception("--- NO CONTROL POINTS WERE SPECIFIED ---")
@@ -57,7 +58,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
         raise Exception("Incorrect control points: {0}".format(coords))
 
     output_name, output_ext = os.path.splitext(outfile)
-    
+
     if output_ext not in [".gif", ".giff"]:
         print "Wrong output file type.\nExpected .gif output file instead of {0}: {1}".format(output_ext, outfile)
         sys.exit(45)
@@ -70,7 +71,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
 
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile1, '+repage', tmpA)
     utl.run_im('-quiet', '-regard-warnings', '-delay', delay, infile2, '+repage', tmpB)
-    
+
     if watermark is not None:
         watermark_c = tempfile.mktemp(suffix='.mpc')
         utl.run_im('-quiet', '-regard-warnings', '-delay', delay, watermark, '+repage', watermark_c)
@@ -108,7 +109,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
             utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
         else:
             utl.run_im('-delay', pause, tmpA, watermark_c, "-composite", output_name + "00000.png")
-            
+
     else:
         # reverse and append if desired
         if reverse:

@@ -40,7 +40,7 @@ import py2exe
 #import shutil
 #import sys
 
-#sys.path.insert(0,os.getcwd())
+#sys.path.insert(0, os.getcwd())
 
 def get_files(dir):
     # dig looking for files

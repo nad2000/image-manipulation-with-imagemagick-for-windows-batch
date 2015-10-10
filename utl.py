@@ -9,12 +9,24 @@ from cStringIO import StringIO
 from functools import partial
 from math import sqrt
 import platform
+import time
 
 import conf
 
+start_ts = time.time()
+
+def show_timing():
+    global verbose, start_ts
+
+    if verbose:
+        if start_ts > 0:
+             print "*** Executed in: %.2fs" % (time.time() - start_ts)
+
+        start_ts = time.time()
+
 
 def log(line):
-    global verbose
+    global verbose, start_ts
 
     if verbose:
         print '#' * 80
@@ -217,11 +229,12 @@ def run_im(*args, **kwargs):
     cmd += flatten_list(args)
     log(cmd)
 
+    output = None
+
     if 'stdout' in kwargs:
         retcode = subprocess.call(cmd, **kwargs)
         if retcode != 0 and verbose:
             print "Last command %s RC=%s" % (cmd, retcode)
-        return None
     else:
         try:
             output = subprocess.check_output(cmd, **kwargs)
@@ -236,7 +249,8 @@ def run_im(*args, **kwargs):
             print '-' * 80
             print output
 
-        return output
+    show_timing()
+    return output
 
 def ffmpeg(*args, **kwargs):
     """
