@@ -33,12 +33,20 @@ def log(line):
         print ' '.join([os.path.basename(line[0]).replace(".exe",'')] + line[1:])
 
 
-def find_command(cmd):
+def find_command(cmd, version=None):
     if os.name == 'nt':
         ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
             cmd + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
         if not os.path.exists(ret):
-            ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared32", cmd + ".exe"))
+
+			shared_dir = "shared32"
+			if version is not None:
+				shared_dir += "=" + version
+
+            ret = os.path.abspath(os.path.join(
+					os.path.dirname(sys.argv[0]),
+					shared_dir,
+					cmd + ".exe"))
             if not os.path.exists(ret):
                 import distutils.spawn
                 ret = distutils.spawn.find_executable(cmd)
