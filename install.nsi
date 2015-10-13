@@ -60,6 +60,9 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR\shared32"
   File "shared32\*.*"
 
+  SetOutPath "$INSTDIR\shared32-6.8.9-3"
+  File "shared32-6.8.9-3\*.*"
+
   ; Stop previously installed service:
   ;;IfFileExists "$INSTDIR\${PRODUCT_SHORT_NAME}.exe" 0 +3
 ;;	ExecWait 'net stop ${PRODUCT_SHORT_NAME}'

@@ -144,7 +144,7 @@ def process(
                     if yy > hh1: yy = hh1
 
                     g = round(100.0 * k / qrange, 8)
-                    
+
                     print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy)
                     print >>gf, "{} {} gray({}%)".format(xx, yy, g)
                     x += size
@@ -213,6 +213,9 @@ def process(
 
 
 if __name__ == "__main__":
+
+    if utl.os.name == 'nt':
+        utl.IM_CMD = utl.find_command('convert', version="6.8.9-3")
 
     o = utl.get_args(USAGE)
 

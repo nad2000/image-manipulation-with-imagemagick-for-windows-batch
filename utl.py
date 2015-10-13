@@ -39,9 +39,9 @@ def find_command(cmd, version=None):
             cmd + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
         if not os.path.exists(ret):
 
-			shared_dir = "shared32"
-			if version is not None:
-				shared_dir += "=" + version
+            shared_dir = "shared32"
+            if version is not None:
+				shared_dir += ("-" + version)
 
             ret = os.path.abspath(os.path.join(
 					os.path.dirname(sys.argv[0]),
