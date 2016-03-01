@@ -1,5 +1,6 @@
 # Standard ignores
 *.pyc
+*.pyn
 *.pyo
 *.DS_Store
 *.swp
@@ -27,3 +28,4 @@ app/shared/*
 build/
 Install/
 dist/
+test/sg_*

@@ -20,7 +20,7 @@ def show_timing():
 
     if verbose:
         if start_ts > 0:
-             print("*** Executed in: %.2fs" % (time.time() - start_ts))
+            print("*** Executed in: %.2fs" % (time.time() - start_ts))
 
         start_ts = time.time()
 
@@ -41,12 +41,12 @@ def find_command(cmd, version=None):
 
             shared_dir = "shared32"
             if version is not None:
-				shared_dir += ("-" + version)
+                shared_dir += ("-" + version)
 
             ret = os.path.abspath(os.path.join(
-					os.path.dirname(sys.argv[0]),
-					shared_dir,
-					cmd + ".exe"))
+                os.path.dirname(sys.argv[0]),
+                shared_dir,
+                cmd + ".exe"))
             if not os.path.exists(ret):
                 import distutils.spawn
                 ret = distutils.spawn.find_executable(cmd)
@@ -258,7 +258,7 @@ def run_im(*args, **kwargs):
             print(output)
 
     show_timing()
-    return output
+    return str(output, "utf-8")
 
 def ffmpeg(*args, **kwargs):
     """
