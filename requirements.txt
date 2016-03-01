@@ -4,3 +4,4 @@ moviepy==0.2.2.11
 numpy>=1.10.4
 tqdm==3.8.0
 wheel==0.29.0
+pillow>=3.1.1
