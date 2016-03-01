@@ -5,7 +5,7 @@ import os
 import sys
 import tempfile
 from docopt import docopt
-from cStringIO import StringIO
+from io import StringIO
 from functools import partial
 from math import sqrt
 import platform
@@ -20,7 +20,7 @@ def show_timing():
 
     if verbose:
         if start_ts > 0:
-             print "*** Executed in: %.2fs" % (time.time() - start_ts)
+             print("*** Executed in: %.2fs" % (time.time() - start_ts))
 
         start_ts = time.time()
 
@@ -29,8 +29,8 @@ def log(line):
     global verbose, start_ts
 
     if verbose:
-        print '#' * 80
-        print ' '.join([os.path.basename(line[0]).replace(".exe",'')] + line[1:])
+        print('#' * 80)
+        print(' '.join([os.path.basename(line[0]).replace(".exe",'')] + line[1:]))
 
 
 def find_command(cmd, version=None):
@@ -79,13 +79,13 @@ def get_args(usage):
 
     o = docopt(usage)
     if verbose:
-        print "Options:"
-        print o
-        print "*** ImageMagick: ", IM_CMD
+        print("Options:")
+        print(o)
+        print("*** ImageMagick: ", IM_CMD)
 
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")
-        print "Wrong password! Access denied!"
+        print("Wrong password! Access denied!")
         sys.exit(-1)
 
     return o
@@ -132,7 +132,7 @@ def get_dim(file_name):
 
 def hsl_to_cspace(tinthue, tintsaturation, tintlightness, cspace):
 
-    tinthue, tintsaturation, tintlightness = map(lambda s: str(s) if type(s) is str else s, [tinthue, tintsaturation, tintlightness])
+    tinthue, tintsaturation, tintlightness = [str(s) if type(s) is str else s for s in [tinthue, tintsaturation, tintlightness]]
     return run_im("-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
            "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:")
 
@@ -242,7 +242,7 @@ def run_im(*args, **kwargs):
     if 'stdout' in kwargs:
         retcode = subprocess.call(cmd, **kwargs)
         if retcode != 0 and verbose:
-            print "Last command %s RC=%s" % (cmd, retcode)
+            print("Last command %s RC=%s" % (cmd, retcode))
     else:
         try:
             output = subprocess.check_output(cmd, **kwargs)
@@ -254,8 +254,8 @@ def run_im(*args, **kwargs):
             output = output.strip()
 
         if verbose and output:
-            print '-' * 80
-            print output
+            print('-' * 80)
+            print(output)
 
     show_timing()
     return output
@@ -281,8 +281,8 @@ def ffmpeg(*args, **kwargs):
             output = output.strip()
 
         if verbose and output:
-            print '-' * 80
-            print output
+            print('-' * 80)
+            print(output)
 
         return output
 
@@ -308,8 +308,8 @@ def avconv(*args, **kwargs):
             output = output.strip()
 
         if verbose and output:
-            print '-' * 80
-            print output
+            print('-' * 80)
+            print(output)
 
         return output
 
@@ -319,9 +319,9 @@ def get_colors(file_name):
     with open_im(file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
         '-define', 'histogram:unique-colors=true', 'histogram:info:-').stdout as lines:
 
-        return [map(
+        return [list(map(
             int,
-            l[l.find('(') + 1:l.find(')')].replace(' ', '').split(',')) for l in lines if '(' in l]
+            l[l.find('(') + 1:l.find(')')].replace(' ', '').split(','))) for l in lines if '(' in l]
 
 
 def delete_tmp_files(*files):
@@ -409,13 +409,13 @@ def make_pached(input_file, output_file, color_map_file):
             log(cmd)
 
             p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-            print "\nProgress:\n"
+            print("\nProgress:\n")
 
             pipe = p.stdin
             for line in out:
                 line = line.strip()
                 if line and line[0] != '#' and " 0) " not in line:
-                    print >>pipe, line[:line.find(':')] + ',' + line[line.rfind(" ")+1:]
+                    print(line[:line.find(':')] + ',' + line[line.rfind(" ")+1:], file=pipe)
 
             pipe.close()
             p.wait()

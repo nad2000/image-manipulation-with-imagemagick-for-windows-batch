@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 10 18:13:46 2014
@@ -35,7 +35,7 @@ def process(infile, outfile, ramt='0', gamt='0', bamt='0', bright='0', contrast=
     # test input image
     utl.run_im('-quiet', '-regard-warnings', infile, '+repage', tmpA1)
 
-    for color, amt in dict(R=int(ramt), G=int(gamt), B=int(bamt)).iteritems():
+    for color, amt in dict(R=int(ramt), G=int(gamt), B=int(bamt)).items():
         if amt == 0:
             continue
 

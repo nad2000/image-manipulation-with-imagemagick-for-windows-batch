@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon May  5 18:13:46 2014
@@ -40,8 +40,8 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
     numoriginalcolors = utl.color_num(tmpA)
 
     if show:
-        print "number of original colors = {}".format(numoriginalcolors)
-        print "number of mapcolors = {}".format(nmapcolors)
+        print("number of original colors = {}".format(numoriginalcolors))
+        print("number of mapcolors = {}".format(nmapcolors))
 
     # reduce colors if more than 256 and ncolors not provided
     if not ncolors:
@@ -56,7 +56,7 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
     ncolors = len(color_arr)
 
     if show:
-        print "number of reduced colors =", ncolors
+        print("number of reduced colors =", ncolors)
 
     # output color reduced image for testing
     utl.run_im(tmpA, infile + '_remap_reduced.png')
@@ -70,7 +70,7 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
 
     # do remapping
     if show:
-        print "\nRemapping Image"
+        print("\nRemapping Image")
 
     tmpO = tempfile.mktemp(suffix='.mpc')
 
@@ -80,7 +80,7 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
 
         c_rgb, m_rgb = "rgb({},{},{})".format(*c), "rgb({},{},{})".format(*m)
         if show:
-            print "{}: {} to {}".format(idx, c_rgb, m_rgb)
+            print("{}: {} to {}".format(idx, c_rgb, m_rgb))
         utl.run_im(
             '(', tmpA, '+transparent', c_rgb, '-fill', m_rgb, '-opaque', c_rgb, ')',
             tmpO, '-composite', tmpO)
@@ -88,12 +88,12 @@ def process(infile, mapfile, outfile, ncolors=None, metric='RGB', show=False):
         utl.run_im(tmpO, outfile)
 
     if show:
-        print "\nFinal colors:"
+        print("\nFinal colors:")
         final_colors = utl.get_colors(tmpO)
         for c in final_colors:
-            print "rgb({},{},{})".format(*c)
+            print("rgb({},{},{})".format(*c))
 
-        print "number of final colors =", len(final_colors)
+        print("number of final colors =", len(final_colors))
 
     utl.delete_tmp_files(tmpA, tmpM, tmpO)
 

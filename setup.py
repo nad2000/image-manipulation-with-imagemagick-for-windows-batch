@@ -20,7 +20,7 @@ AUTHOR = 'Radomirs Cirskis'
 COPYRIGHT ="(c) 2014, 2015 Radomirs Cirskis",
 
 with open('config.nsh', 'w') as nsh:
-    print >>nsh, """
+    print("""
     !define PRODUCT_NAME "%s"
     !define PRODUCT_VERSION "%s"
     !define PRODUCT_PUBLISHER "%s"
@@ -31,7 +31,7 @@ with open('config.nsh', 'w') as nsh:
         VERSION,
         PUBLISHER,
         WEBSITE,
-        NAME,)
+        NAME,), file=nsh)
 
 from distutils.core import setup
 import os
@@ -50,7 +50,7 @@ def get_files(dir):
 
     while (b):
         try:
-            (dirpath, dirnames, files) = a.next()
+            (dirpath, dirnames, files) = next(a)
             filenames.append([dirpath, tuple(files)])
         except:
             b = False
@@ -70,7 +70,7 @@ def get_files(dir):
 #    create_exe = True,
 #    create_dll = True)
 
-print 'Compiling as a Windows executable ...'
+print('Compiling as a Windows executable ...')
 #setup(console = ['cartoon.py'], options = {'py2exe': {'bundle_files': 1, 'compressed': True}})
 
 setup(

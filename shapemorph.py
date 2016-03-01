@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon May  7 22:13:46 2015
@@ -60,7 +60,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
     output_name, output_ext = os.path.splitext(outfile)
 
     if output_ext not in [".gif", ".giff"]:
-        print "Wrong output file type.\nExpected .gif output file instead of {0}: {1}".format(output_ext, outfile)
+        print("Wrong output file type.\nExpected .gif output file instead of {0}: {1}".format(output_ext, outfile))
         sys.exit(45)
 
     # create the in between frames
@@ -93,7 +93,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
     corners = "0,0 0,0  {0},0 {0},0  {0},{1} {0},{1}  0,{1} 0,{1}".format(wm1, hm1)
 
     # do geometric warping and intensity blending
-    print "Processing {0} Frames:".format(frames)
+    print("Processing {0} Frames:".format(frames))
 
     # initial coord for destination for both images
     cpx, cpy = xx1, yy1
@@ -103,7 +103,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
     dy = round(float(yy2 - yy1) / frames_between, 4)
 
 
-    print "0 (start image)"
+    print("0 (start image)")
     if separate:
         if watermark is None:
             utl.run_im('-delay', pause, tmpA, output_name + "00000.png")
@@ -125,7 +125,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
 
 
     for i in range(1, frames):
-        print i
+        print(i)
         blend = round((100. * i) / frames_between, 4)
         # new same location for a given iteration used for both images
         cpx += dx
@@ -166,7 +166,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
 
     else:
         # add infile2 as last frame
-        print frames, "(end image)"
+        print(frames, "(end image)")
 
     if separate:
         if watermark is None:

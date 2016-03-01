@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon May  18 18:13:46 2014
@@ -112,14 +112,14 @@ def process(
     qrange = int(utl.run_im("xc:", "-format", "%[fx:quantumrange]", "info:"))
 
     if rseed is not None and rseed.strip() != "":
-        random.seed(long(rseed))
+        random.seed(int(rseed))
 
     size = int(size)
     offset = int(offset)
 
     with open(tmpC, 'w') as cf, open(tmpG, 'w') as gf:
 
-        print >>cf, "# ImageMagick pixel enumeration: {},{},255,rgb".format(ww, hh)
+        print("# ImageMagick pixel enumeration: {},{},255,rgb".format(ww, hh), file=cf)
 
         if kind in ["random", "r"]:
             y = k = 0
@@ -145,8 +145,8 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy)
-                    print >>gf, "{} {} gray({}%)".format(xx, yy, g)
+                    print("{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(xx, yy), file=cf)
+                    print("{} {} gray({}%)".format(xx, yy, g), file=gf)
                     x += size
                     k += 1
 
@@ -166,8 +166,8 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({}%)".format(x, y, g)
+                    print("{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y), file=cf)
+                    print("{} {} gray({}%)".format(x, y, g), file=gf)
                     x += size
                     k += 1
 
@@ -189,8 +189,8 @@ def process(
 
                     g = round(100.0 * k / qrange, 8)
 
-                    print >>cf, "{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y)
-                    print >>gf, "{} {} gray({}%)".format(x, y, g)
+                    print("{},{}: (255,255,255)\t#FFFFFF\trgb(255,255,255)".format(x, y), file=cf)
+                    print("{} {} gray({}%)".format(x, y, g), file=gf)
                     x += size
                     k += 1
 
