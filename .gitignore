@@ -24,3 +24,6 @@ app/shared/*
 .settings/org.eclipse.core.resources.prefs
 .spyderproject
 
+build/
+Install/
+dist/
