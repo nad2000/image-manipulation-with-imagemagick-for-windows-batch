@@ -1,6 +1,7 @@
 decorator==4.0.9
 imageio==1.5
-moviepy==0.2.2.11
+#moviepy==0.2.2.11
+git+https://github.com/Zulko/moviepy.git
 numpy>=1.10.4
 tqdm==3.8.0
 wheel==0.29.0
