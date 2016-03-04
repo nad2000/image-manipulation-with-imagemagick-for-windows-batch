@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import utl
-import os
 
+import os
 import moviepy
 from moviepy.editor import VideoFileClip
 

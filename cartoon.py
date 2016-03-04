@@ -65,7 +65,7 @@ def process(pattern, numlevels, edgeamount, brightness, saturation, infile, outf
         '(', '-clone', '0', setcspace,
         '-colorspace', 'gray', ')',
         '(', '-clone', '3', '-negate', '-blur', '0x'+str(edgewidth), ')',
-	  '(', '-clone', '3', '-clone', '4', '-compose', 'over', '-compose', 'colordodge', '-composite',
+        '(', '-clone', '3', '-clone', '4', '-compose', 'over', '-compose', 'colordodge', '-composite',
         '-evaluate', 'pow', edgeamount, '-threshold', str(edgethresh)+'%', medproc,
         ')', '-delete', '0,1,3,4', '-compose', 'over', '-compose', 'multiply', '-composite', outfile)
 

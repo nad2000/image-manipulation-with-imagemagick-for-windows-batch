@@ -12,12 +12,12 @@
 # Configuration settings:
 NAME = 'EditImageWithIM'
 DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '2.08'
+VERSION = '3.00A'
 WEBSITE = 'http://www.nowITworks.eu'
 PUBLISHER = WEBSITE
 REVISION = NAME + ' ' + VERSION
 AUTHOR = 'Radomirs Cirskis'
-COPYRIGHT ="(c) 2014, 2015 Radomirs Cirskis",
+COPYRIGHT ="(c) 2014, 2015, 2016 Radomirs Cirskis",
 
 with open('config.nsh', 'w') as nsh:
     print("""
@@ -84,6 +84,7 @@ setup(
     url = WEBSITE,
     license = 'WTFPL',
     console = [
+        {'script': 'clip.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'gotham.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'kelvin.py', 'icon_resources': [(1, 'app.ico')],},
         {'script': 'lomo.py', 'icon_resources': [(1, 'app.ico')],},

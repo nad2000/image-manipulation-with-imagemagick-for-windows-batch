@@ -15,6 +15,8 @@ import conf
 
 start_ts = time.time()
 
+MY_DIR = os.path.abspath(os.path.dirname(sys.argv[0]))
+
 def show_timing():
     global verbose, start_ts
 
@@ -40,7 +42,7 @@ def find_command(cmd, version=None):
         if not os.path.exists(ret):
 
             shared_dir = "shared32"
-            if version is not None:
+            if cmd == "convert" and version is not None:
                 shared_dir += ("-" + version)
 
             ret = os.path.abspath(os.path.join(
@@ -48,10 +50,12 @@ def find_command(cmd, version=None):
                 shared_dir,
                 cmd + ".exe"))
             if not os.path.exists(ret):
-                import distutils.spawn
-                ret = distutils.spawn.find_executable(cmd)
-                if ret is None and cmd == 'avconv':
-                    ret = find_command('ffmpeg')
+                ret = os.path.abspath(os.path.join(shared_dir, cmd + ".exe"))
+                if not os.path.exists(ret):
+                    import distutils.spawn
+                    ret = distutils.spawn.find_executable(cmd)
+                    if ret is None and cmd == 'avconv':
+                        ret = find_command('ffmpeg')
         return ret
     else:
         return cmd
@@ -60,6 +64,16 @@ IM_CMD = find_command('convert')
 COMPOSITE_CMD = find_command('coposite')
 FFMPEG_CMD = find_command('ffmpeg')
 AVCONV_CMD = find_command('avconv')
+
+# Variable settings for Imageio:
+if os.name == 'nt':
+    os.environ['IMAGEIO_FFMPEG_EXE'] = FFMPEG_CMD
+    FREEIMAGE_LIB = "freeimage-3.15.4-win32.dll"
+    
+    lib_path = os.path.join(MY_DIR, "shared32", FREEIMAGE_LIB)
+    if not os.path.exists(lib_path):
+        lib_path = os.path.join("shared32", FREEIMAGE_LIB)
+        os.environ["IMAGEIO_FREEIMAGE_LIB"] = lib_path
 
 verbose = False
 
