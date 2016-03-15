@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import subprocess
 import os
 import sys
@@ -73,7 +75,8 @@ if os.name == 'nt':
     lib_path = os.path.join(MY_DIR, "shared32", FREEIMAGE_LIB)
     if not os.path.exists(lib_path):
         lib_path = os.path.join("shared32", FREEIMAGE_LIB)
-        os.environ["IMAGEIO_FREEIMAGE_LIB"] = lib_path
+    #os.environ["IMAGEIO_FREEIMAGE_LIB"] = lib_path
+    #os.environ["IMAGEIO_FREEIMAGE_LIB"] = "shared32"
 
 verbose = False
 

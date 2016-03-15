@@ -1,3 +1,4 @@
+SetCompress auto
 SetCompressor /SOLID lzma
 
 !include /NONFATAL config.nsh

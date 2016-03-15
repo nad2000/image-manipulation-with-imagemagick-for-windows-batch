@@ -4,8 +4,8 @@ set upxEXE=%CD%\tools\upx391w\upx.exe
 
 rd /Q /S dist build
 
-py -3 setup.py py2exe
-
+py -2 setup.py py2exe
+:: goto:eof
 goto:mkinst
 :: recompression works only with bundle_files = 2 or 3
 cd dist
@@ -14,7 +14,7 @@ mkdir library
 %zip7% x library.zip -aoa -olibrary
 del library.zip
 cd library
-move ..\*.jpg .\
+:: move ..\*.jpg .\
 
 :: %zip7% a -tzip -mx9 "..\library.zip" -r
 %zip7% a -tzip "..\library.zip" -r

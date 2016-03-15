@@ -9,17 +9,19 @@
 # Licence:  WTFPL
 #-------------------------------------------------------------------------------
 
+from __future__ import print_function
+
 # Configuration settings:
-NAME = 'EditImageWithIM'
-DESCRIPTION = 'Image Batch Editing With ImageMagick'
-VERSION = '3.00A'
-WEBSITE = 'http://www.nowITworks.eu'
+NAME = "EditImageWithIM"
+DESCRIPTION = "Image Batch Editing With ImageMagick"
+VERSION = "3.00"
+WEBSITE = "http://www.nowITworks.eu"
 PUBLISHER = WEBSITE
-REVISION = NAME + ' ' + VERSION
-AUTHOR = 'Radomirs Cirskis'
+REVISION = NAME + " " + VERSION
+AUTHOR = "Radomirs Cirskis"
 COPYRIGHT ="(c) 2014, 2015, 2016 Radomirs Cirskis",
 
-with open('config.nsh', 'w') as nsh:
+with open("config.nsh", "w") as nsh:
     print("""
     !define PRODUCT_NAME "%s"
     !define PRODUCT_VERSION "%s"
@@ -56,66 +58,69 @@ def get_files(dir):
             b = False
     return filenames
 
-#class Target:
-#    def __init__(self,**kw):
-#        self.__dict__.update(kw)
-#        self.version        = VERSION
-#        self.name           = NAME
-#        self.description    = DESCRIPTION
 
-#my_com_server_target = Target(
-#    description    = DESCRIPTION,
-#    service = ["service_module"],
-#    modules = ["service_module"],
-#    create_exe = True,
-#    create_dll = True)
+print("Compiling as a Windows executable ...")
+#setup(console = ["cartoon.py"], options = {"py2exe": {"bundle_files": 1, "compressed": True}})
 
-print('Compiling as a Windows executable ...')
-#setup(console = ['cartoon.py'], options = {'py2exe': {'bundle_files': 1, 'compressed': True}})
-
+#NB! FIX/WORKAROUND: with missing DLLs, copy them to C:\Python27\DLLs
 setup(
     name = NAME,
     description = DESCRIPTION,
     version = VERSION,
     author = AUTHOR,
-    author_email = 'nad2000 AT gmail DOT com',
+    author_email = "nad2000 AT gmail DOT com",
     maintainer = AUTHOR,
-    maintainer_email = 'nad2000 AT gmail DOT com',
+    maintainer_email = "nad2000 AT gmail DOT com",
     url = WEBSITE,
-    license = 'WTFPL',
+    license = "WTFPL",
     console = [
-        {'script': 'clip.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'gotham.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'kelvin.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'lomo.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'nashville.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'toaster.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'stainedglass.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'vintage1.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'vintage2.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'vintage3.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'toycamera.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'crossprocess.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'sketch.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'shapemorph.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'thermography.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'nightvision.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'vignette.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'cartoon.py', 'icon_resources': [(1, 'app.ico')],},
-        {'script': 'remap.py', 'icon_resources': [(1, 'app.ico')],},
+        {"script": "clip.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "gotham.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "kelvin.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "lomo.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "nashville.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "toaster.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "stainedglass.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "vintage1.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "vintage2.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "vintage3.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "toycamera.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "crossprocess.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "sketch.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "shapemorph.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "thermography.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "nightvision.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "vignette.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "cartoon.py", "icon_resources": [(1, "app.ico")],},
+        {"script": "remap.py", "icon_resources": [(1, "app.ico")],},
     ],
-    options = {'py2exe': {'bundle_files': 1, 'compressed': True, "optimize": '2'}},
+    options = {
+        "py2exe": {
+                "bundle_files": 1,
+                #"compressed": True,
+                "compressed": False,
+                #"xref": True,
+                #"optimize": "2",
+                "dll_excludes": ["msvcr71.dll"],  # Exclude msvcr71
+                "excludes": [
+                    "pywin", "pywin.debugger", "pywin.debugger.dbgcon",
+                    "pywin.dialogs", "pywin.dialogs.list",
+                    "Tkconstants", "Tkinter", "tcl", "tkinter", "PyQt5",
+                    "_ssl",  # Exclude _ssl
+                    "pyreadline",
+                    #"difflib",
+                    "doctest",
+                    #"locale",
+                    "optparse",
+                    #"pickle",
+                    #"calendar"
+                 ],
+                "packages": ["moviepy"],
+            },
+        },
     #zipfile=None,
     zipfile="shared\\shared.lib",
-    data_files = [('shared', ['Kelvin.jpg', 'Nashville.jpg'])],
-    dll_excludes=['msvcr71.dll'],  # Exclude msvcr71
-    excludes = [
-		"pywin", "pywin.debugger", "pywin.debugger.dbgcon",
-        "pywin.dialogs", "pywin.dialogs.list",
-        "Tkconstants", "Tkinter", "tcl",
-        "_ssl",  # Exclude _ssl
-        "pyreadline", "difflib", "doctest", "locale",
-        "optparse", "pickle", "calendar"],
+    data_files = [("shared", ["Kelvin.jpg", "Nashville.jpg"])],
 )
 
 
@@ -123,8 +128,8 @@ setup(
 #    name = NAME,
 #    description = DESCRIPTION,
 #    version = VERSION,
-#    console = [{'script': 'cartoon.py', 'icon_resources': [(1, 'app.ico')],}],
-#    options = {'py2exe': {'bundle_files': 1, 'compressed': True, "optimize": '2'}},
+#    console = [{"script": "cartoon.py", "icon_resources": [(1, "app.ico")],}],
+#    options = {"py2exe": {"bundle_files": 1, "compressed": True, "optimize": "2"}},
 #    zipfile=None)
 
 
@@ -133,18 +138,18 @@ setup(
 #    description = DESCRIPTION,
 #    version = VERSION,
 #    console = [{
-#        'script': 'cartoon.py',
-#        'icon_resources': [(1, 'app.ico')],
-#        #'other_resources': [(u"VERSIONTAG", 1, REVISION)],
+#        "script": "cartoon.py",
+#        "icon_resources": [(1, "app.ico")],
+#        #"other_resources": [(u"VERSIONTAG", 1, REVISION)],
 #    }],
-#    options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
+#    options = {"py2exe": {"bundle_files": 1, "compressed": True}},
 #    zipfile=None,
 #
 ##	options = {
 ##	    "py2exe":{
-##		'packages': 'encodings',
-##		#'includes': 'win32com,win32service,win32serviceutil,win32event',
-##		"optimize": '2'
+##		"packages": "encodings",
+##		#"includes": "win32com,win32service,win32serviceutil,win32event",
+##		"optimize": "2"
 ##	    },
 ##	},
 #)

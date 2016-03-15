@@ -6,6 +6,8 @@ Created on Mon May  18 18:13:46 2014
 @author: rad.cirskis
 """
 
+from __future__ import print_function
+
 import tempfile
 import utl
 from utl import run_im
