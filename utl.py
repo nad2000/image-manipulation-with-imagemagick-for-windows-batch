@@ -442,3 +442,12 @@ def make_pached(input_file, output_file, color_map_file):
                 "-compose", "copy_opacity", "-composite", input_file)
         with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:").stdout as out:
             run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi", "@-", output_file, stdin=out)
+
+
+def num_val(string_val):
+    """ Retruns eithe int or float"""
+
+    if string_val is None:
+        return None
+    else:
+        return float(string_val) if '.' in string_val else int(string_val)
