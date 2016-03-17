@@ -1,5 +1,7 @@
 decorator==4.0.9
-imageio==1.5
+#imageio==1.5
+#git+https://github.com/imageio/imageio.git
+git+https://github.com/nad2000/imageio.git
 #moviepy==0.2.2.11
 #git+https://github.com/Zulko/moviepy.git
 git+https://github.com/nad2000/moviepy.git

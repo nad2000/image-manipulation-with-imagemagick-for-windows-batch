@@ -75,7 +75,7 @@ if os.name == 'nt':
     lib_path = os.path.join(MY_DIR, "shared32", FREEIMAGE_LIB)
     if not os.path.exists(lib_path):
         lib_path = os.path.join("shared32", FREEIMAGE_LIB)
-    #os.environ["IMAGEIO_FREEIMAGE_LIB"] = lib_path
+    os.environ["IMAGEIO_FREEIMAGE_LIB"] = lib_path
     #os.environ["IMAGEIO_FREEIMAGE_LIB"] = "shared32"
 
 verbose = False
@@ -96,9 +96,16 @@ def get_args(usage):
 
     o = docopt(usage)
     if verbose:
-        print("Options:")
-        print(o)
+        print("Options:\n========")
+        for item in o.items():
+            print("{}: {}".format(*item))
+         
+        print("*** MY_DIR: ", MY_DIR)
         print("*** ImageMagick: ", IM_CMD)
+        print("*** FFMPEG: ", FFMPEG_CMD)
+        print("*** COMPOSITE_CMD: ", COMPOSITE_CMD)
+        print("*** FREEIMAGE_LIB: ", FREEIMAGE_LIB)
+        print("*** IMAGEIO_FREEIMAGE_LIB: ", os.environ["IMAGEIO_FREEIMAGE_LIB"])
 
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")

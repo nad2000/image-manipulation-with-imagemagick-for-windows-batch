@@ -14,7 +14,7 @@ from __future__ import print_function
 # Configuration settings:
 NAME = "EditImageWithIM"
 DESCRIPTION = "Image Batch Editing With ImageMagick"
-VERSION = "3.01"
+VERSION = "3.02"
 WEBSITE = "http://www.nowITworks.eu"
 PUBLISHER = WEBSITE
 REVISION = NAME + " " + VERSION
