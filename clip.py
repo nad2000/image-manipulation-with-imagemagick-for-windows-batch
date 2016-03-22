@@ -9,11 +9,12 @@ import moviepy
 from moviepy.editor import VideoFileClip, ImageClip
 from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 import moviepy.video.tools.drawing as dw
+import numpy as np
 
 USAGE = """
 USAGE:
   clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--freeze-at AT] [--freeze-x1 FX1] [--freeze-y1 FY1] [--freeze-x2 FX2] [--freeze-y2 FY2] INFILE [OUTFILE]
-  clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--mask-p1 P1] [--mask-p2 P2] [--mask-grad WIDTH] INFILE [OUTFILE]
+  clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--point POINT...] [--mask-grad WIDTH] INFILE [OUTFILE]
   clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--mask MASK] INFILE [OUTFILE]
   clip -h|--help
 
@@ -22,7 +23,7 @@ OPTIONS:
   -e END             clip END [default: end of the input]
   --speedx SPEEDX    change playback speed by ration SPEEDX, e.g., 0.5
   --fps FPS          output file frame rate (fps)
-  --fuzz FUZZ        fuzz (0-100) is for GIF compression
+  --fuzz FUZZ     fuzz (0-100) is for GIF compression
   -H HEIGHT          height in pixels or a float representing a scaling factor, like 0.5
   -W WIDTH           width in pixels or a float representing a scaling factor, like 0.5
   --x1 X1            x1, y1 is the lower right corner of the croped region
@@ -34,8 +35,7 @@ OPTIONS:
   --freeze-y1 FY1    freezing region top Y coordinate fraction, e.g., 0.5
   --freeze-x2 FX2    freezing region right X coordinate fraction, e.g., 0.5
   --freeze-y2 FY2    freezing region bottom Y coordinate fraction, e.g., 0.5
-  --mask-p1 P1       coordinates P1 and P2 define the edges of the mask
-  --mask-p2 P2       coordinates P1 and P2 define the edges of the mask
+  --point POINT      coordinates a point that defines the edges of the mask (could)
   --mask-grad WIDTH  mask gradient width for bluring the edges [default: 5]
   --mask MASK        image maks (a grayscale image)
   -P PASSWORD        password for accessing the application
@@ -65,7 +65,7 @@ def clip(infile, outfile=None, **kwargs):
     cl = VideoFileClip(infile).subclip(
             time_stamp(options.get("-s")),
             time_stamp(options.get("-e")))
-    if "--speedx" in options and not("--mask-p1" in options or "--mask-p2" in options):
+    if "--speedx" in options and "--point" not in options:
         cl = cl.speedx(num_val(options["--speedx"]))
 
     if "-H" in options and "-W" in options:
@@ -97,15 +97,23 @@ def clip(infile, outfile=None, **kwargs):
             cl = CompositeVideoClip([cl, snapshot])
 
     # Freezing a region with a mask
-    if "--mask-p1" in options and "--mask-p2" in options:
-        edges = {k[-2:]: tuple(map(num_val, v.split(','))) for k, v in options.items() if "--mask-p" in k}
-        mask = dw.color_split(
-                    cl.size,
-                    grad_width=num_val(options["--mask-grad"]),
-                    **edges)
+    if "--point" in options and options["--point"] != []:
+        points = [tuple(map(num_val, p.split(','))) for n, p in enumerate(options["--point"], 1)]
+        mask = np.ones((cl.h, cl.w))
+        edges = zip(points[:-1], points[1:])
+        for p1, p2 in edges:
+            mask = np.logical_and(mask, dw.color_split(
+                        cl.size,
+                        grad_width=num_val(options["--mask-grad"]),
+                        p1=p1, p2=p2))
+        mask = ImageClip(mask, ismask=True)
         snapshot = (cl.to_ImageClip(freeze_at)
                     .set_duration(cl.duration)
-                    .set_mask(ImageClip(mask, ismask=True)))
+                    .set_mask(mask))
+        if utl.verbose:
+            outfile_name, _ = os.path.splitext(outfile) 
+            mask.save_frame(outfile_name + "_mask.png")
+            snapshot.save_frame(outfile_name + "_snapshot.png")
         cl = CompositeVideoClip([cl, snapshot])
         if "--speedx" in options:
             cl = cl.speedx(num_val(options["--speedx"]))
@@ -117,6 +125,9 @@ def clip(infile, outfile=None, **kwargs):
         snapshot = (cl.to_ImageClip(freeze_at)
                     .set_duration(cl.duration)
                     .set_mask(mask))
+        if utl.verbose:
+            outfile_name, _ = os.path.splitext(outfile) 
+            snapshot.save_frame(outfile_name + "_snapshot.png")
         cl = CompositeVideoClip([cl, snapshot])
         if "--speedx" in options:
             cl = cl.speedx(num_val(options["--speedx"]))
