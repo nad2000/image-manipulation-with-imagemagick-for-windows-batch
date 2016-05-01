@@ -24,8 +24,13 @@ _setup_.*
 app/shared/*
 .settings/org.eclipse.core.resources.prefs
 .spyderproject
+config.nsh
 
 build/
 Install/
 dist/
 test/sg_*
+tests/sq_*
+.tox/
+env/
+.cache/

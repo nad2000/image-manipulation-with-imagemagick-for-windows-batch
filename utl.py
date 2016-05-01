@@ -104,8 +104,10 @@ def get_args(usage):
         print("*** ImageMagick: ", IM_CMD)
         print("*** FFMPEG: ", FFMPEG_CMD)
         print("*** COMPOSITE_CMD: ", COMPOSITE_CMD)
-        print("*** FREEIMAGE_LIB: ", FREEIMAGE_LIB)
-        print("*** IMAGEIO_FREEIMAGE_LIB: ", os.environ["IMAGEIO_FREEIMAGE_LIB"])
+
+        if os.name == 'nt':
+            print("*** FREEIMAGE_LIB: ", FREEIMAGE_LIB)
+            print("*** IMAGEIO_FREEIMAGE_LIB: ", os.environ["IMAGEIO_FREEIMAGE_LIB"])
 
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")
@@ -282,7 +284,7 @@ def run_im(*args, **kwargs):
             print(output)
 
     show_timing()
-    return str(output, "utf-8")
+    return str(output, "utf-8") if sys.version[0] == 3 else str(output).encode("utf-8")
 
 def ffmpeg(*args, **kwargs):
     """
