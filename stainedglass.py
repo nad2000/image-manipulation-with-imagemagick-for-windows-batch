@@ -50,7 +50,9 @@ size and border around the cell can be specified.
 
 
 def process(
-        infile, outfile, kind, size, offset, ncolors, bright, ecolor, thick, rseed, average):
+        infile, outfile, kind="random", size="16", offset="6",
+        ncolors=None, bright="100", ecolor="black", thick="1", rseed=None,
+        average=False):
 
     tmpA1 = tempfile.mktemp(suffix='.mpc')
     tmpB1 = tempfile.mktemp(suffix='.cache')
@@ -113,9 +115,6 @@ def process(
 
     qrange = int(utl.run_im("xc:", "-format", "%[fx:quantumrange]", "info:"))
 
-    if rseed is not None and rseed.strip() != "":
-        random.seed(int(rseed))
-
     size = int(size)
     offset = int(offset)
 
@@ -124,6 +123,10 @@ def process(
         print("# ImageMagick pixel enumeration: {},{},255,rgb".format(ww, hh), file=cf)
 
         if kind in ["random", "r"]:
+
+            if not (rseed is None or rseed.strip() == ""):
+                random.seed(int(rseed))
+
             y = k = 0
             offset += 1
 

@@ -46,6 +46,9 @@ def find_command(cmd, version=None):
             shared_dir = "shared32"
             if cmd == "convert" and version is not None:
                 shared_dir += ("-" + version)
+            # to run .EXE from dist directory:
+            if not os.path.exists(shared_dir):
+                shared_dir = os.path.join("..", shared_dir)
 
             ret = os.path.abspath(os.path.join(
                 os.path.dirname(sys.argv[0]),
