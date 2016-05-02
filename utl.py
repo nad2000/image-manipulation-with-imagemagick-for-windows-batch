@@ -455,7 +455,11 @@ def make_pached(input_file, output_file, color_map_file):
         with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:").stdout as out:
             run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi", "@-", output_file, stdin=out)
 
+            
+def remove_meta(input_name, output_name):
+    run_im(input_name, "-define", 'profile:skip="*"', "-strip", output_name)
 
+    
 def num_val(string_val):
     """ Retruns eithe int or float"""
 

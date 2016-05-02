@@ -19,8 +19,12 @@ if sg.utl.os.name == 'nt':
 
 BUF_SIZE = 65536  # 64kb chunks    
 def file_sha1(file_name):
+    # remove all meta data (so that hash gets calculated based on only image data):
+    no_profile_name = "_noprofile".join(os.path.splitext(file_name))
+    sg.utl.remove_meta(file_name, no_profile_name)
+    
     sha1 = hashlib.sha1()
-    with open(file_name, "r") as f:
+    with open(no_profile_name, "rb") as f:
         while True:
             data = f.read(BUF_SIZE)
             if not data:
@@ -30,10 +34,10 @@ def file_sha1(file_name):
 
 
 @pytest.mark.parametrize("kind, thick, rseed, expected", [
-    ("random",  "1", "56", "14c0523fd102ebd6e2f74c557c87a2f831d29937"),
-    ("hexagon", "1", None, "6f98de8d48fb82d60098d8e93cce2408ea898952"),
-    ("square",  "1", None, "5dc0781c61face607d682aee72ae8ac12c83c398"),
-    ("random",  "0", "56", "ee42638e4792d58f99627447ceb1015baab7f87e"),
+    ("random",  "1", "56", "1a01a0f5511e2d73784edf490a7d04b5f9286de1"),
+    ("hexagon", "1", None, "c0a2a3211f16ea632f3494eb1df422da2b711960"),
+    ("square",  "1", None, "07eb027ee4fc57039f22c1784a8787b075c9692e"),
+    ("random",  "0", "56", "dcc9bf6ddde7371a0929422b91b93b079a21ce84"),
 ])    
 def test_birdofparadise(kind, thick, rseed, expected):
     output_name = tempfile.mktemp(suffix=".gif")
@@ -44,10 +48,10 @@ def test_birdofparadise(kind, thick, rseed, expected):
 
     
 @pytest.mark.parametrize("kind, thick, rseed, expected", [
-    ("random",  "1", "0",  "6708ea33106f75ddffc4d867839f1161e4652e70"),
-    ("hexagon", "1", None, "124723898918cbce159785fc804b03e1a2b94706"),
-    ("square",  "1", None, "57d12019b31b56322c12a2c5391b4a9c2c6c919a"),
-    ("random",  "0", "0",  "41cb8438007c80bccf46a19ff6a5fac531810787"),
+    ("random",  "1", "0",  "26c3c064a9b12b07f814afceb878704528f58c8f"),
+    ("hexagon", "1", None, "2f2199ae77ddd30bef9b2fd2d135fba8f96126f9"),
+    ("square",  "1", None, "ef603e740bf8c26a56c4600b6776d5923e9960ac"),
+    ("random",  "0", "0",  "e630713be1e13523c0fe08f5435a952516712101"),
 ])    
 def test_face(kind, thick, rseed, expected):
     output_name = tempfile.mktemp(suffix=".png")
