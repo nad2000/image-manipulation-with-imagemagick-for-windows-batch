@@ -19,6 +19,7 @@ start_ts = time.time()
 
 MY_DIR = os.path.abspath(os.path.dirname(sys.argv[0]))
 
+
 def show_timing():
     global verbose, start_ts
 
@@ -34,13 +35,14 @@ def log(line):
 
     if verbose:
         print('#' * 80)
-        print(' '.join([os.path.basename(line[0]).replace(".exe",'')] + line[1:]))
+        print(
+            ' '.join([os.path.basename(line[0]).replace(".exe", '')] + line[1:]))
 
 
 def find_command(cmd, version=None):
     if os.name == 'nt':
         ret = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), "shared",
-            cmd + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
+                                           cmd + ("64" if platform.machine().endswith("64") else "32") + ".exe"))
         if not os.path.exists(ret):
 
             shared_dir = "shared32"
@@ -74,7 +76,7 @@ AVCONV_CMD = find_command('avconv')
 if os.name == 'nt':
     os.environ['IMAGEIO_FFMPEG_EXE'] = FFMPEG_CMD
     FREEIMAGE_LIB = "freeimage-3.15.4-win32.dll"
-    
+
     lib_path = os.path.join(MY_DIR, "shared32", FREEIMAGE_LIB)
     if not os.path.exists(lib_path):
         lib_path = os.path.join("shared32", FREEIMAGE_LIB)
@@ -90,19 +92,18 @@ def get_args(usage):
 
     if "--verbose" in sys.argv:
         verbose = True
-        sys.argv.pop(sys.argv.index("--verbose"))
+        sys.argv.remove("--verbose")
 
     # if -P option is absent, exit quietly
     if "-P" not in sys.argv:
         sys.exit(-1)
-
 
     o = docopt(usage)
     if verbose:
         print("Options:\n========")
         for item in o.items():
             print("{}: {}".format(*item))
-         
+
         print("*** MY_DIR: ", MY_DIR)
         print("*** ImageMagick: ", IM_CMD)
         print("*** FFMPEG: ", FFMPEG_CMD)
@@ -110,7 +111,8 @@ def get_args(usage):
 
         if os.name == 'nt':
             print("*** FREEIMAGE_LIB: ", FREEIMAGE_LIB)
-            print("*** IMAGEIO_FREEIMAGE_LIB: ", os.environ["IMAGEIO_FREEIMAGE_LIB"])
+            print("*** IMAGEIO_FREEIMAGE_LIB: ",
+                  os.environ["IMAGEIO_FREEIMAGE_LIB"])
 
     if o['-P'] != conf.PASSWORD:
         # raise Exception("Wrong password! Access denied!")
@@ -122,6 +124,7 @@ def get_args(usage):
 #%%
 im_version = None
 
+
 def get_im_version():
     global im_version
     if im_version is None:
@@ -130,11 +133,13 @@ def get_im_version():
         version = version[:version.find('\n')]
         if version == '':
             version = run_im('-version')
-            version = version[version.find('Version: ImageMagick ') + len('Version: '):]
+            version = version[version.find(
+                'Version: ImageMagick ') + len('Version: '):]
             version = version[:version.find('\n')]
             version = version.replace('.', ',').replace('-', ',')
         version = version.split()[1]
-        version = ''.join(['0' + n if len(n) == 1 else n for n in version.split(',')])
+        version = ''.join(
+            ['0' + n if len(n) == 1 else n for n in version.split(',')])
         im_version = version
     return im_version
 
@@ -161,9 +166,10 @@ def get_dim(file_name):
 
 def hsl_to_cspace(tinthue, tintsaturation, tintlightness, cspace):
 
-    tinthue, tintsaturation, tintlightness = [str(s) if type(s) is str else s for s in [tinthue, tintsaturation, tintlightness]]
+    tinthue, tintsaturation, tintlightness = [str(s) if type(
+        s) is str else s for s in [tinthue, tintsaturation, tintlightness]]
     return run_im("-size", "1x1", 'xc:hsl({}%,{}%,{}%)'.format(tinthue, tintsaturation, tintlightness),
-           "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:")
+                  "-colorspace", cspace, "-format", '%[pixel:u.p{0,0}]', "info:")
 
 
 def hsl_to_srgb(tinthue, tintsaturation, tintlightness):
@@ -221,8 +227,9 @@ def flatten_list(tree):
     """
     thelist = []
     for e in tree:
-        if e is None or (type(e) is str and  e.strip() == ''):
+        if e is None or (type(e) is str and e.strip() == ''):
             continue
+
         if not isinstance(e, (list, tuple)):
             thelist += [e]
         else:
@@ -289,6 +296,7 @@ def run_im(*args, **kwargs):
     show_timing()
     return str(output, "utf-8") if sys.version[0] == 3 else str(output).encode("utf-8")
 
+
 def ffmpeg(*args, **kwargs):
     """
     Run FFMPEG command
@@ -346,7 +354,7 @@ def avconv(*args, **kwargs):
 def get_colors(file_name):
 
     with open_im(file_name, '-alpha', 'off', '-depth', '8', '-format', '%c',
-        '-define', 'histogram:unique-colors=true', 'histogram:info:-').stdout as lines:
+                 '-define', 'histogram:unique-colors=true', 'histogram:info:-').stdout as lines:
 
         return [list(map(
             int,
@@ -384,20 +392,22 @@ def rgbl_dist(c, m):
 def setup_vignette(file_name, vignetteshape, vignettesize, vignetterounding):
     """setup vignette"""
 
-    ww, hh = get_dim( file_name)
+    ww, hh = get_dim(file_name)
 
     vignetteshape = vignetteshape.lower()[0]
     if vignetteshape in ["v", "h"]:  # "vertical", "horizontal"
 
         run_im("-size", str(ww) + 'x' + str(hh), "xc:black", "-crop",
-                "100x" + vignettesize + "+0+0%" if vignetteshape == "v" else vignettesize + "x100+0+0%",
-                "+repage", "-background", "white", "-gravity", "center", "-extent", str(ww) + 'x' + str(hh),
-                "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", file_name)
+               "100x" + vignettesize + "+0+0%" if vignetteshape == "v" else vignettesize + "x100+0+0%",
+               "+repage", "-background", "white", "-gravity", "center", "-extent", str(
+            ww) + 'x' + str(hh),
+            "-morphology", "distance", "euclidean:4", "-auto-level", "-negate", file_name)
 
     elif vignetteshape == "r":  # "roundrectangle"
 
         xc, yc = ww / 2., hh / 2.
-        ww2, hh2 = str(int(vignettesize) * ww / 200.), str(int(vignettesize) * hh / 200.)
+        ww2, hh2 = str(int(vignettesize) * ww /
+                       200.), str(int(vignettesize) * hh / 200.)
         rounding = str(min(ww, hh) * int(vignetterounding) / 100.)
         run_im("-size", str(ww) + 'x' + str(hh), "xc:white", "-fill", "black",
                "-draw", "translate {},{} roundrectangle -{},-{} {},{} {},{}".format(
@@ -423,15 +433,14 @@ def make_pached(input_file, output_file, color_map_file):
     if version >= "06080310":
 
         with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
-                    "-compose", "copy_opacity", "-composite", "sparse-color:-").stdout as out:
+                     "-compose", "copy_opacity", "-composite", "sparse-color:-").stdout as out:
             run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color",
-                    "voronoi", "@-", output_file, stdin=out)
+                   "voronoi", "@-", output_file, stdin=out)
 
-    elif version < "06060210" or  not process_test:
+    elif version < "06060210" or not process_test:
 
         with open_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
-                    "-compose", "copy_opacity", "-composite", "-monitor", "txt:-").stdout as out:
-
+                     "-compose", "copy_opacity", "-composite", "-monitor", "txt:-").stdout as out:
 
             cmd = [IM_CMD, "-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi",
                    "@-", "+monitor", output_file]
@@ -444,22 +453,24 @@ def make_pached(input_file, output_file, color_map_file):
             for line in out:
                 line = line.strip()
                 if line and line[0] != '#' and " 0) " not in line:
-                    print(line[:line.find(':')] + ',' + line[line.rfind(" ")+1:], file=pipe)
+                    print(line[:line.find(':')] + ',' +
+                          line[line.rfind(" ") + 1:], file=pipe)
 
             pipe.close()
             p.wait()
 
     else:
-        run_im(input_file, "(", "-background","black", color_map_file, ")", "-alpha", "off",
-                "-compose", "copy_opacity", "-composite", input_file)
+        run_im(input_file, "(", "-background", "black", color_map_file, ")", "-alpha", "off",
+               "-compose", "copy_opacity", "-composite", input_file)
         with open_im(input_file, "-alpha", "on", "-process", "getColors", "null:").stdout as out:
-            run_im("-size", "{}x{}".format(ww, hh), "xc:", "-sparse-color", "voronoi", "@-", output_file, stdin=out)
+            run_im("-size", "{}x{}".format(ww, hh), "xc:",
+                   "-sparse-color", "voronoi", "@-", output_file, stdin=out)
 
-            
+
 def remove_meta(input_name, output_name):
     run_im(input_name, "-define", 'profile:skip="*"', "-strip", output_name)
 
-    
+
 def num_val(string_val):
     """ Retruns eithe int or float"""
 

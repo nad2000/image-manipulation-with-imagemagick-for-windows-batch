@@ -9,7 +9,7 @@ import utl
 
 USAGE = """
 USAGE:
-	gotham -P PASSWORD INFILE OUTFILE
+ gotham -P PASSWORD INFILE OUTFILE
 
 OPTIONS:
  -P PASSWORD   password for accessing the application

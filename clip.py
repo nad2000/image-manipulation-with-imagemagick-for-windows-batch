@@ -41,6 +41,7 @@ OPTIONS:
   -P PASSWORD        password for accessing the application
 """
 
+
 def time_stamp(string_val):
     """ Retruns a tuple of either float or int values"""
 
@@ -63,8 +64,8 @@ def clip(infile, outfile=None, **kwargs):
         outfile = os.path.splitext(infile)[0] + ".gif"
 
     cl = VideoFileClip(infile).subclip(
-            time_stamp(options.get("-s")),
-            time_stamp(options.get("-e")))
+        time_stamp(options.get("-s")),
+        time_stamp(options.get("-e")))
     if "--speedx" in options and "--point" not in options:
         cl = cl.speedx(num_val(options["--speedx"]))
 
@@ -75,43 +76,50 @@ def clip(infile, outfile=None, **kwargs):
         val = num_val(options.get("-H") or options.get("-W"))
         cl = cl.resize(val)
 
-    region = {k[2:]: num_val(options[k]) for k in options if k in ("--x1", "--x2", "--y1", "--x2")}
+    region = {k[2:]: num_val(options[k]) for k in options if k in (
+        "--x1", "--x2", "--y1", "--x2")}
     if region != {}:
         cl = cl.crop(**region)
-        
-    freeze_at = num_val(options["--freeze-at"]) if "--freeze-at" in options else 0
+
+    freeze_at = num_val(options["--freeze-at"]
+                        ) if "--freeze-at" in options else 0
 
     # Freeze a region:
     if "--freeze-at" in options and "--mask" not in options:
-        region = {k[9:]: num_val(options[k]) for k in options if k in ("--freeze-x1", "--freeze-x2", "--freeze-y1", "--freeze-x2")}
+        region = {k[9:]: num_val(options[k]) for k in options if k in (
+            "--freeze-x1", "--freeze-x2", "--freeze-y1", "--freeze-x2")}
         if region == {}:
-            print("*** To freeze a region at least one region coordinate should be specified!")
+            print(
+                "*** To freeze a region at least one region coordinate should be specified!")
         elif not all((v > 0.0 and v <= 1.0 for v in region.values())):
-            print("*** The region for freezing should be defined by coordinate fractions!")
+            print(
+                "*** The region for freezing should be defined by coordinate fractions!")
         else:
-            region = {k: int(round((cl.w if k[0] == 'x' else cl.h) * v)) for k, v in region.items()}
+            region = {
+                k: int(round((cl.w if k[0] == 'x' else cl.h) * v)) for k, v in region.items()}
             snapshot = (cl
-                .crop(**region)
-                .to_ImageClip(freeze_at)
-                .set_duration(cl.duration))
+                        .crop(**region)
+                        .to_ImageClip(freeze_at)
+                        .set_duration(cl.duration))
             cl = CompositeVideoClip([cl, snapshot])
 
     # Freezing a region with a mask
     if "--point" in options and options["--point"] != []:
-        points = [tuple(map(num_val, p.split(','))) for n, p in enumerate(options["--point"], 1)]
+        points = [tuple(map(num_val, p.split(',')))
+                  for n, p in enumerate(options["--point"], 1)]
         mask = np.ones((cl.h, cl.w))
         edges = zip(points[:-1], points[1:])
         for p1, p2 in edges:
             mask = np.logical_and(mask, dw.color_split(
-                        cl.size,
-                        grad_width=num_val(options["--mask-grad"]),
-                        p1=p1, p2=p2))
+                cl.size,
+                grad_width=num_val(options["--mask-grad"]),
+                p1=p1, p2=p2))
         mask = ImageClip(mask, ismask=True)
         snapshot = (cl.to_ImageClip(freeze_at)
                     .set_duration(cl.duration)
                     .set_mask(mask))
         if utl.verbose:
-            outfile_name, _ = os.path.splitext(outfile) 
+            outfile_name, _ = os.path.splitext(outfile)
             mask.save_frame(outfile_name + "_mask.png")
             snapshot.save_frame(outfile_name + "_snapshot.png")
         cl = CompositeVideoClip([cl, snapshot])
@@ -126,7 +134,7 @@ def clip(infile, outfile=None, **kwargs):
                     .set_duration(cl.duration)
                     .set_mask(mask))
         if utl.verbose:
-            outfile_name, _ = os.path.splitext(outfile) 
+            outfile_name, _ = os.path.splitext(outfile)
             snapshot.save_frame(outfile_name + "_snapshot.png")
         cl = CompositeVideoClip([cl, snapshot])
         if "--speedx" in options:
