@@ -8,7 +8,7 @@ set upxEXE=%CD%\tools\upx391w\upx.exe
 rd /Q /S dist build Install
 
 ::py -3.4-32 setup.py py2exe
-py -2.7-32 setup.py py2exe
+py -2 setup.py py2exe
 
 cd dist
 %upxEXE% --best *.exe 

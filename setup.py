@@ -14,7 +14,7 @@ from __future__ import print_function
 # Configuration settings:
 NAME = "EditImageWithIM"
 DESCRIPTION = "Image Batch Editing With ImageMagick"
-VERSION = "3.03.2"
+VERSION = "3.04.0"
 WEBSITE = "http://www.nowITworks.eu"
 PUBLISHER = WEBSITE
 REVISION = NAME + " " + VERSION
@@ -67,13 +67,23 @@ MANIFEST_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <dependentAssembly>
         <assemblyIdentity
             type="win32"
+            name="Microsoft.VC90.CRT"
+            version="9.0.30729.4918"
+            processorArchitecture="X86"
+            publicKeyToken="1fc8b3b9a1e18e3b"
+            language="*"
+        />
+    </dependentAssembly>
+    <!-- dependentAssembly>
+        <assemblyIdentity
+            type="win32"
             name="Microsoft.Windows.Common-Controls"
             version="6.0.0.0"
             processorArchitecture="*"
             publicKeyToken="6595b64144ccf1df"
             language="*"
         />
-    </dependentAssembly>
+    </dependentAssembly -->
   </dependency>
 </assembly>
 '''
