@@ -2,8 +2,7 @@
 Usage examples:
 
     py -2.7-32 -m py.test
-    py -2.7-32 -m py.test -k face
-    py -2.7-32 -m py.test -k bird
+    py -2.7-32 -m py.test -k stamps
 """
 
 import os
@@ -18,7 +17,7 @@ utl.verbose = True
 if utl.os.name == 'nt':
     utl.IM_CMD = utl.find_command('convert', version="6.8.9-3")
     
-POSTMARKS_FN = os.path.join(os.path.dirname(os.path.realpath(__file__)), "postmarks.jpg")
+POSTMARKS_FN = os.path.join(os.path.dirname(os.path.realpath(__file__)), "stamps.jpg")
 EXE = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "dist", "bg_removal.exe"))
 TEST_PARAMS = [
     ("0", "100", False, False, False, "black", "1e81c3307358f9d9f0777c371139becc17cdd1da"),
@@ -30,7 +29,7 @@ TEST_PARAMS = [
 ]
 
 @pytest.mark.parametrize("fuzz_out, fuzz_in, additive, showmasks, replace, background, expected", TEST_PARAMS)    
-def test_postmarks(fuzz_out, fuzz_in, additive, showmasks, replace, background, expected):
+def test_stamps(fuzz_out, fuzz_in, additive, showmasks, replace, background, expected):
     output_name = tempfile.mktemp(suffix=".png")
 
     process(
@@ -42,7 +41,7 @@ def test_postmarks(fuzz_out, fuzz_in, additive, showmasks, replace, background, 
 
         
 @pytest.mark.parametrize("fuzz_out, fuzz_in, additive, showmasks, replace, background, expected", TEST_PARAMS)    
-def test_postmarks_exe(fuzz_out, fuzz_in, additive, showmasks, replace, background, expected):
+def test_exe(fuzz_out, fuzz_in, additive, showmasks, replace, background, expected):
 
     if os.path.exists(EXE):
     
