@@ -44,6 +44,51 @@ import py2exe
 
 #sys.path.insert(0, os.getcwd())
 
+MANIFEST_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity
+    version="5.0.0.0"
+    processorArchitecture="*"
+    name="%(prog)s"
+    type="win32"
+  />
+  <description>%(prog)s</description>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel
+            level="%(level)s"
+            uiAccess="false">
+        </requestedExecutionLevel>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentAssembly>
+        <assemblyIdentity
+            type="win32"
+            name="Microsoft.Windows.Common-Controls"
+            version="6.0.0.0"
+            processorArchitecture="*"
+            publicKeyToken="6595b64144ccf1df"
+            language="*"
+        />
+    </dependentAssembly>
+  </dependency>
+</assembly>
+'''
+
+RT_BITMAP = 2
+RT_MANIFEST = 24
+
+def manifesest(prog_name):
+    return (
+        RT_MANIFEST, 1,
+        (MANIFEST_TEMPLATE % 
+            dict(prog="stainedglass", level="asInvoker")).encode("utf-8")
+    )
+
+    
 def get_files(dir):
     # dig looking for files
     a= os.walk(dir)
@@ -71,28 +116,26 @@ setup(
     author_email = "nad2000 AT gmail DOT com",
     maintainer = AUTHOR,
     maintainer_email = "nad2000 AT gmail DOT com",
+    
     url = WEBSITE,
     license = "WTFPL",
     console = [
-        {"script": "clip.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "gotham.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "kelvin.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "lomo.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "nashville.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "toaster.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "stainedglass.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "vintage1.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "vintage2.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "vintage3.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "toycamera.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "crossprocess.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "sketch.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "shapemorph.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "thermography.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "nightvision.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "vignette.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "cartoon.py", "icon_resources": [(1, "app.ico")],},
-        {"script": "remap.py", "icon_resources": [(1, "app.ico")],},
+        dict(
+            script=prog_name + ".py",
+            company_name="nowITworks (http://www.nowitworks.eu)",
+            copyright=u"Radomirs Cirskis © 2014, 2015, 2016",
+            legal_copyright=u"Radomirs Cirskis © 2014, 2015, 2016",
+            legal_trademark="Radomirs Cirskis (rad AT nowitworks DOT eu)",
+            product_version=VERSION,
+            product_name=DESCRIPTION,
+            icon_resources=[(1, "app.ico")],
+            other_resources=[
+                manifesest(prog_name),
+                # for bitmap resources, the first 14 bytes must be skipped when reading the file:
+                # (RT_BITMAP, 1, open("bitmap.bmp", "rb").read()[14:]),
+                (u"VERSIONTAG", 1, VERSION)
+            ]
+        ) for prog_name in ["bg_removal", "clip", "gotham", "kelvin", "lomo", "nashville", "toaster", "stainedglass", "vintage1", "vintage2", "vintage3", "toycamera", "crossprocess", "sketch", "shapemorph", "thermography", "nightvision", "vignette", "cartoon", "remap",]
     ],
     options = {
         "py2exe": {

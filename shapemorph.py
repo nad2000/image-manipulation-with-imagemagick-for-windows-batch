@@ -113,7 +113,7 @@ def process(infile1, infile2, outfile, frames=20, delay='10', pause='100', rever
     else:
         # reverse and append if desired
         if reverse:
-            final_im = utl.open_im("-", "(", "-clone", "-2-1", ")", "-loop", '0', output_name + ".gif", stdin=PIPE)
+            final_im = utl.open_im("- ( -clone -2-1 ) -loop 0".slit(), output_name + ".gif", stdin=PIPE)
         else:
             final_im = utl.open_im("-", "-loop", '0', output_name + ".gif", stdin=PIPE)
 

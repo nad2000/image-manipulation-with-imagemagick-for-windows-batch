@@ -11,7 +11,7 @@ import re
 
 USAGE = """
 USAGE:
- bg_removal -P PASSWORD [-n] [-a] [-r] [-m] [-b COLOR] [-c COLOR] IMAGE FUZZ_OUT FUZZ_IN IMAGE_OUT
+ bg_removal -P PWD [-n] [-a] [-r] [-m] [-b COLOR] [-c COLOR] IMAGE FUZZ_OUT FUZZ_IN IMAGE_OUT
  bg_removal -h|-help
 
 OPTIONS:
@@ -27,6 +27,8 @@ OPTIONS:
  -c COLOR  the color or the background image that should be removed
            (by default, if no color or image given, top-left corner pixel color
            of the source image)
+ -P PWD    password for accessing the application
+
 
 
 Attempt to remove the given background image, given color, or top-left
@@ -74,6 +76,8 @@ def process(
 
     if showmasks:
         showmasks = "( -clone 3,2,4 -combine -clone 0 -write x: -delete 0--1 )".split()
+    else:
+        showmasks = None
 
     grayscale = (
         "-separate -compose plus -background black -flatten" if additive else "-colorspace gray").split()
@@ -82,24 +86,25 @@ def process(
         grayscale.append(" -normalize")
 
     utl.run_im(
-        image, "(", "-clone", "0", background, "-compose Difference -composite".split(),
-        grayscale, "-channel B -evaluate 'set' 0 +channel ) ( -clone 1 -fill blue -fuzz".split(
-        ),
-        fuzz_out, fill, "-channel B -separate +channel ) ( -clone 1 -fill blue -fuzz".split(
-        ),
-        fuzz_in, fill,  "-channel B -separate +channel -negate )".split(),
+        image, "(", "-clone", "0", bgnd, "-compose Difference -composite".split(),
+        grayscale, "-channel B -evaluate set 0 +channel ) ( -clone 1 -fill blue -fuzz".split(),
+        fuzz_out + '%', fill, "-channel B -separate +channel ) ( -clone 1 -fill blue -fuzz".split(),
+        fuzz_in + '%', fill,  "-channel B -separate +channel -negate )".split(),
         "( -clone 2,3 -negate -compose multiply -composite )".split(), showmasks,
         "( -clone 0,3 +matte -compose CopyOpacity -composite ) \
         ( -clone 1 -channel R -separate +channel \
         -clone 4 +matte -compose CopyOpacity -composite \
         ( +clone -blur 0x30 +matte ) +swap -compose Over -composite \
         +matte -normalize \
-        -clone 4 -compose multiply -composite  \
+        -clone 4 -compose multiply -composite \
         -background".split(),  background, "-alpha shape \
         -clone 5 -compose over -composite ) -delete 0--2".split(), image_out)
 
 
 if __name__ == "__main__":
+
+    if utl.os.name == 'nt':
+        utl.IM_CMD = utl.find_command('convert', version="6.8.9-3")
 
     o = utl.get_args(USAGE)
 

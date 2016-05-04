@@ -7,7 +7,6 @@ Usage examples:
 """
 
 import os
-import hashlib
 import subprocess
 import pytest
 import tempfile
@@ -16,22 +15,6 @@ import stainedglass as sg
 #sg.utl.verbose = True
 if sg.utl.os.name == 'nt':
     sg.utl.IM_CMD = sg.utl.find_command('convert', version="6.8.9-3")
-
-BUF_SIZE = 65536  # 64kb chunks    
-def file_sha1(file_name):
-    # remove all meta data (so that hash gets calculated based on only image data):
-    no_profile_name = "_noprofile".join(os.path.splitext(file_name))
-    sg.utl.remove_meta(file_name, no_profile_name)
-    
-    sha1 = hashlib.sha1()
-    with open(no_profile_name, "rb") as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data:
-                break
-            sha1.update(data)
-    return sha1
-
 
 @pytest.mark.parametrize("kind, thick, rseed, expected", [
     ("random",  "1", "56", "1a01a0f5511e2d73784edf490a7d04b5f9286de1"),
@@ -59,5 +42,7 @@ def test_face(kind, thick, rseed, expected):
 
     sg.process(kind=kind, thick=thick, rseed=rseed, infile=input_name, outfile=output_name)
     assert file_sha1(output_name).hexdigest() == expected
+    
+ 
 
 

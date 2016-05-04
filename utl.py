@@ -12,6 +12,7 @@ from functools import partial
 from math import sqrt
 import platform
 import time
+import hashlib
 
 import conf
 
@@ -20,6 +21,25 @@ start_ts = time.time()
 MY_DIR = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 
+BUF_SIZE = 65536  # 64kb chunks 
+def file_sha1(file_name):
+    """
+    Calculates SHA1 hash for a large file.
+    """
+    # remove all meta data (so that hash gets calculated based on only image data):
+    no_profile_name = "_noprofile".join(os.path.splitext(file_name))
+    remove_meta(file_name, no_profile_name)
+    
+    sha1 = hashlib.sha1()
+    with open(no_profile_name, "rb") as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            sha1.update(data)
+    return sha1
+
+    
 def show_timing():
     global verbose, start_ts
 
@@ -35,8 +55,9 @@ def log(line):
 
     if verbose:
         print('#' * 80)
+        cmd_short = os.path.basename(line[0]).replace(".exe", '')
         print(
-            ' '.join([os.path.basename(line[0]).replace(".exe", '')] + line[1:]))
+            ' '.join([cmd_short] + line[1:]))
 
 
 def find_command(cmd, version=None):
@@ -270,7 +291,8 @@ def run_im(*args, **kwargs):
     global verbose
 
     cmd = [IM_CMD]
-    cmd += flatten_list(args)
+    cmd.extend(flatten_list(args))
+    print ("*****", cmd)
     log(cmd)
 
     output = None
