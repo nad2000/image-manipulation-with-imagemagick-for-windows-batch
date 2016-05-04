@@ -59,7 +59,7 @@ that.
 def process(
         image, fuzz_out, fuzz_in, image_out,
         replace=False,  showmasks=False, additive=False,
-        normalize=False, background=False, color=None):
+        normalize=False, background="black", color=None):
 
     if color is not None:
         if re.search(r":|/|\.|\ ", color):  # This can't be a color, so use it as a normal image

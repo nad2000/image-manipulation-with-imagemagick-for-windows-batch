@@ -144,7 +144,7 @@ setup(
                 "compressed": False,
                 #"xref": True,
                 #"optimize": "2",
-                "dll_excludes": ["msvcr71.dll"],  # Exclude msvcr71
+                "dll_excludes": ["msvcr71.dll", "msvcp90.dll", "numpy-atlas.dll"],  # Exclude msvcr71
                 "excludes": [
                     "pywin", "pywin.debugger", "pywin.debugger.dbgcon",
                     "pywin.dialogs", "pywin.dialogs.list",

@@ -1,14 +1,14 @@
-decorator==4.0.9
+decorator>=4.0.9
 #imageio==1.5
 #git+https://github.com/imageio/imageio.git
 git+https://github.com/nad2000/imageio.git
 #moviepy==0.2.2.11
 #git+https://github.com/Zulko/moviepy.git
 git+https://github.com/nad2000/moviepy.git
-numpy>=1.10.4
-tqdm==3.8.0
-wheel==0.29.0
+numpy==1.10.4 ## 1.11.0 is broken
+tqdm>=3.8.0
+wheel>=0.29.0
 pillow>=3.1.1
 pytest
-tox
+#tox
 

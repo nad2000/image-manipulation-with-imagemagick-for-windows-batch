@@ -11,10 +11,10 @@ import subprocess
 import pytest
 import tempfile
 
-import stainedglass as sg
+from stainedglass import process, utl
 #sg.utl.verbose = True
-if sg.utl.os.name == 'nt':
-    sg.utl.IM_CMD = sg.utl.find_command('convert', version="6.8.9-3")
+if os.name == 'nt':
+    utl.IM_CMD = utl.find_command('convert', version="6.8.9-3")
 
 @pytest.mark.parametrize("kind, thick, rseed, expected", [
     ("random",  "1", "56", "1a01a0f5511e2d73784edf490a7d04b5f9286de1"),
@@ -26,8 +26,8 @@ def test_birdofparadise(kind, thick, rseed, expected):
     output_name = tempfile.mktemp(suffix=".gif")
     input_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "birdofparadise.gif")
 
-    sg.process(kind=kind, thick=thick, rseed=rseed, infile=input_name, outfile=output_name, bright="150")
-    assert file_sha1(output_name).hexdigest() == expected
+    process(kind=kind, thick=thick, rseed=rseed, infile=input_name, outfile=output_name, bright="150")
+    assert utl.file_sha1(output_name).hexdigest() == expected
 
     
 @pytest.mark.parametrize("kind, thick, rseed, expected", [
@@ -40,8 +40,8 @@ def test_face(kind, thick, rseed, expected):
     output_name = tempfile.mktemp(suffix=".png")
     input_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "face.jpg")
 
-    sg.process(kind=kind, thick=thick, rseed=rseed, infile=input_name, outfile=output_name)
-    assert file_sha1(output_name).hexdigest() == expected
+    process(kind=kind, thick=thick, rseed=rseed, infile=input_name, outfile=output_name)
+    assert utl.file_sha1(output_name).hexdigest() == expected
     
  
 
