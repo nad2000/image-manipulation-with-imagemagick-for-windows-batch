@@ -10,11 +10,12 @@
 #-------------------------------------------------------------------------
 
 from __future__ import print_function
+import numpy  ## workaround to make py2exe find "libiomp5md.dll" :O (not a slightest idea how it works)
 
 # Configuration settings:
 NAME = "EditImageWithIM"
 DESCRIPTION = "Image Batch Editing With ImageMagick"
-VERSION = "3.04.0"
+VERSION = "3.04.1"
 WEBSITE = "http://www.nowITworks.eu"
 PUBLISHER = WEBSITE
 REVISION = NAME + " " + VERSION
@@ -137,7 +138,7 @@ setup(
             copyright=u"Radomirs Cirskis © 2014, 2015, 2016",
             legal_copyright=u"Radomirs Cirskis © 2014, 2015, 2016",
             legal_trademark="Radomirs Cirskis (rad AT nowitworks DOT eu)",
-            product_version=VERSION,
+            product_version=REVISION,
             product_name=DESCRIPTION,
             icon_resources=[(1, "app.ico")],
             other_resources=[
@@ -147,7 +148,7 @@ setup(
                 (u"VERSIONTAG", 1, VERSION)
             ]
         ) for prog_name in ["bg_removal",
-                            # "clip",
+                            "clip",
                             "gotham", "kelvin", "lomo", "nashville", "toaster", "stainedglass", "vintage1", "vintage2", "vintage3", "toycamera", "crossprocess", "sketch", "shapemorph", "thermography", "nightvision", "vignette", "cartoon", "remap", ]
     ],
     options={
@@ -158,7 +159,12 @@ setup(
             #"xref": True,
             #"optimize": "2",
             # Exclude msvcr71
-            "dll_excludes": ["msvcr71.dll", "msvcp90.dll", "numpy-atlas.dll", "libiomp5md.dll"],
+            "dll_excludes": [
+                #"msvcr71.dll", 
+                "msvcp90.dll", 
+                #"numpy-atlas.dll",
+                #"libiomp5md.dll"
+            ],
             "excludes": [
                 "pywin", "pywin.debugger", "pywin.debugger.dbgcon",
                 "pywin.dialogs", "pywin.dialogs.list",
