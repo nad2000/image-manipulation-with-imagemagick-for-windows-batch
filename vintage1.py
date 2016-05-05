@@ -16,7 +16,7 @@ USAGE:
      [-L VERTICALLINES] [-B VERTICALBANDS] [-M BACKGROUNDMIX] [-T BORDERTYPE]
      [-W BORDERWIDTH] [-R BORDERROUNDING] [-C BORDERCOLOR]
      INFILE OUTFILE [BACKGROUNDFILE]
- vintage1 -h|--help
+ vintage1 -h|-?|--help
 
 OPTIONS:
  -b BRIGHTNESS        vintage brightness; -100<=integer<=100; [default: 10]

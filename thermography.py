@@ -12,7 +12,7 @@ import utl
 USAGE = """
 USAGE:
  thermography -P PASSWORD [-l LOWPT] [-H HIGHPT] INFILE OUTFILE
- thermography -h|--help
+ thermography -h|-?|--help
 
 OPTIONS:
  -l LOWPT     low point value on color table; float; 0<=integer<=100; [default: 0]

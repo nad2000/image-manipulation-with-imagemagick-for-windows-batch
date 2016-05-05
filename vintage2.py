@@ -17,7 +17,7 @@ USAGE:
      [-N NOISEAMOUNT] [-L VERTICALLINES] [-B VERTICALBANDS] [-M BACKGROUNDMIX]
      [-T BORDERTYPE] [-W BORDERWIDTH] [-R BORDERROUNDING] [-C BORDERCOLOR]
      INFILE OUTFILE [BACKGROUNDFILE]
- vintage2 -h|--help
+ vintage2 -h|-?|--help
 
 OPTIONS:
  -1 COLOR1            color1 for vintage colorizing; [default: yellow]

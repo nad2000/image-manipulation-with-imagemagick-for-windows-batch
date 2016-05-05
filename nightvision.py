@@ -12,7 +12,7 @@ import utl
 USAGE = """
 USAGE:
     nightvision -P PASSWORD [-b BRIGHTNESS] [-d DIAMETER] [-r ROLLOFF] [-n NOISE] [-s SEED] [-B] [-T THRESHOLD] INFILE OUTFILE
-    nightvision -h|--help
+    nightvision -h|-?|--help
 
 OPTIONS:
  -b BRIGHTNESS  brightness of night view; 0<=integer<=200; [default: 100]

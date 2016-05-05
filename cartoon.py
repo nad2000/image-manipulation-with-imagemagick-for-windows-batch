@@ -12,7 +12,7 @@ import utl
 USAGE = """
 USAGE:
  cartoon -P PASSWORD [-p PATTERN] [-n NUMLEVELS] [-e EDGEAMOUNT] [-b BRIGHTNESS] [-s SATURATION] INFILE OUTFILE
- cartoon -h|--help
+ cartoon -h|-?|--help
 
 OPTIONS:
  -p PATTERN     segmentation pattern (shape); 0<=integer<=100; [default: 70]

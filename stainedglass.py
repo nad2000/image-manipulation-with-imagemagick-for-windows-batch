@@ -17,7 +17,7 @@ USAGE = """
 USAGE:
  stainedglass -P PASSWORD [-k KIND] [-s SIZE] [-o OFFSET] [-n NCOLORS] [-b BRIGHT]
   [-e ECOLOR] [-t THICK] [-r RSEED] [-a] INFILE OUTFILE
- stainedglass -h|--help
+ stainedglass -h|-?|--help
 
 OPTIONS:
  -k KIND      kind of stainedglass cell shape; choices are: square
