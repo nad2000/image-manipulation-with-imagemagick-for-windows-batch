@@ -11,23 +11,23 @@ import re
 
 USAGE = """
 USAGE:
- bg_removal -P PWD [-n] [-a] [-r] [-m] [-b COLOR] [-c COLOR] IMAGE FUZZ_OUT FUZZ_IN IMAGE_OUT
+ bg_removal -P PWD [-n] [-a] [-r] [-m] [-b BACKGROUND] [-c COLOR] IMAGE FUZZ_OUT FUZZ_IN IMAGE_OUT
  bg_removal -h|-help
 
 OPTIONS:
- -n        Normalize the differences between image and background
- -a        Add the channel differences instead of simply grayscaling
-           this will require larger fuzz factor differences)
- -r        use color replacement instead of flood-fill for mask generation
-           this lets you find 'holes' within the image object
- -m        Flicker compare (space to swap) the masks found with the original
-           image.  Press 'q' to continue processing
-           green = object   blue = semi-trans edge  red = transparency
- -b COLOR  use this color for background semi-transparent [default: black]
- -c COLOR  the color or the background image that should be removed
-           (by default, if no color or image given, top-left corner pixel color
-           of the source image)
- -P PWD    password for accessing the application
+ -n             Normalize the differences between image and background
+ -a             Add the channel differences instead of simply grayscaling
+                this will require larger fuzz factor differences)
+ -r             use color replacement instead of flood-fill for mask generation
+                this lets you find 'holes' within the image object
+ -m             Flicker compare (space to swap) the masks found with the original
+                image.  Press 'q' to continue processing
+                green = object   blue = semi-trans edge  red = transparency
+ -b BACKGROUND  use this color for background semi-transparent [default: black]
+ -c COLOR       the color or the background image that should be removed
+                (by default, if no color or image given, top-left corner pixel color
+                of the source image)
+ -P PWD         password for accessing the application
 
 
 

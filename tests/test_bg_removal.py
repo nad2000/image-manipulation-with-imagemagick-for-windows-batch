@@ -14,7 +14,7 @@ from bg_removal import process, utl
 from conf import PASSWORD
 
 utl.verbose = True
-if utl.os.name == 'nt':
+if os.name == 'nt':
     utl.IM_CMD = utl.find_command('convert', version="6.8.9-3")
     
 POSTMARKS_FN = os.path.join(os.path.dirname(os.path.realpath(__file__)), "stamps.jpg")
