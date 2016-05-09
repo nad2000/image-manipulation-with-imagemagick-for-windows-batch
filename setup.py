@@ -15,7 +15,7 @@ import numpy  ## workaround to make py2exe find "libiomp5md.dll" :O (not a sligh
 # Configuration settings:
 NAME = "EditImageWithIM"
 DESCRIPTION = "Image Batch Editing With ImageMagick"
-VERSION = "3.04.1"
+VERSION = "3.04.2"
 WEBSITE = "http://www.nowITworks.eu"
 PUBLISHER = WEBSITE
 REVISION = NAME + " " + VERSION
