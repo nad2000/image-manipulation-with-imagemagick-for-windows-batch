@@ -12,7 +12,7 @@ import utl
 USAGE = """
 USAGE:
  sketch -P PASSWORD [-k KIND] [-e EDGE] [-c CON] [-s SAT] [-g] INFILE OUTFILE
- sketch -h|--help
+ sketch -h|-?|--help
 
 OPTIONS:
  -k KIND      kind of grayscale conversion; options are gray(g) or

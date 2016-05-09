@@ -12,7 +12,7 @@ import re
 USAGE = """
 USAGE:
  bg_removal -P PWD [-n] [-a] [-r] [-m] [-b BACKGROUND] [-c COLOR] IMAGE FUZZ_OUT FUZZ_IN IMAGE_OUT
- bg_removal -h|-help
+ bg_removal -h|-?|-help
 
 OPTIONS:
  -n             Normalize the differences between image and background

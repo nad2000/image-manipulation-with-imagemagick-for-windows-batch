@@ -116,9 +116,12 @@ def get_args(usage):
         sys.argv.remove("--verbose")
 
     # if -P option is absent, exit quietly
-    if "-P" not in sys.argv:
+    if "-P" not in sys.argv and not any((o in sys.argv for o in ["-h", "-?", "--help"])):
         sys.exit(-1)
 
+    if "-?" in sys.argv:  ## allow '-?' for help
+        sys.argv.append("-h")
+       
     o = docopt(usage)
     if verbose:
         print("Options:\n========")

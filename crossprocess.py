@@ -12,7 +12,7 @@ import utl
 USAGE = """
 USAGE:
  crossprocess -P PASSWORD [-r RAMT] [-g GAMT] [-b BAMT] [-B BRIGHT] [-C CONTRAST] INFILE OUTFILE
- crossprocess -h|-help
+ crossprocess -h|-?|--help
 
 OPTIONS:
  -r RAMT      red sigmoidal-contrast amount; -100<=integer<=100; [default: 0] (no change)

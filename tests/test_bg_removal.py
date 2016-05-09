@@ -61,6 +61,7 @@ def test_exe(fuzz_out, fuzz_in, additive, showmasks, replace, background, expect
         output_name_cmd = tempfile.mktemp(suffix=".png")
         cmd.extend([POSTMARKS_FN, fuzz_out, fuzz_in, output_name_cmd])
 
+        utl.log(cmd)
         call(cmd)
         
         assert utl.file_sha1(output_name_cmd).hexdigest() == expected

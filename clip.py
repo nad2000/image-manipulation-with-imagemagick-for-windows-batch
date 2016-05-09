@@ -16,7 +16,7 @@ USAGE:
   clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--freeze-at AT] [--freeze-x1 FX1] [--freeze-y1 FY1] [--freeze-x2 FX2] [--freeze-y2 FY2] INFILE [OUTFILE]
   clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--point POINT...] [--mask-grad WIDTH] INFILE [OUTFILE]
   clip -P PASSWORD [-s START] [-e END] [--speedx SPEEDX] [--fps FPS] [--fuzz FUZZ] [-H HEIGHT] [-W WIDTH] [--x1 X1] [--x2 X2] [--y1 Y1] [--y2 Y2] [--mask MASK] INFILE [OUTFILE]
-  clip -h|--help
+  clip -h|-?|--help
 
 OPTIONS:
   -s START           clip START in the format of "hour,min,sec" or "min,sec" or "sec" [default: 0]
